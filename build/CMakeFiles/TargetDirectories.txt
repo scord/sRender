@@ -1,0 +1,3 @@
+/Users/samcordingley/dev/sRender/build/CMakeFiles/rebuild_cache.dir
+/Users/samcordingley/dev/sRender/build/CMakeFiles/edit_cache.dir
+/Users/samcordingley/dev/sRender/build/CMakeFiles/sRender.dir

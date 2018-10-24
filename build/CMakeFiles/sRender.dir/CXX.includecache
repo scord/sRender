@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/samcordingley/dev/sRender/src/core/brdf.h
+../core/smath.h
+/Users/samcordingley/dev/sRender/src/core/smath.h
+random
+-
+
+/Users/samcordingley/dev/sRender/src/core/geometry.cpp
+geometry.h
+/Users/samcordingley/dev/sRender/src/core/geometry.h
+../core/smath.h
+/Users/samcordingley/dev/sRender/src/core/smath.h
+
+/Users/samcordingley/dev/sRender/src/core/geometry.h
+../core/smath.h
+/Users/samcordingley/dev/sRender/src/core/smath.h
+vector
+-
+brdf.h
+/Users/samcordingley/dev/sRender/src/core/brdf.h
+
+/Users/samcordingley/dev/sRender/src/core/smath.h
+cmath
+-
+vector
+-
+
