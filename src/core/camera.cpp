@@ -6,13 +6,13 @@ Camera::Camera(Vector3 pos, int w, int h, double fov) {
     width = w;
     height = h;
     fovH = fov;
-    fovV = fovH*h/w;
+    fovV = fov*h/w;
 }
 
 Vector3 Camera::screenToCamera(const Vector2 screenCoord) {
     return Vector3(
-        -1.0+(2*(screenCoord.x+0.5)/width)*std::tan(fovH),
-        1.0-(2*(screenCoord.y+0.5)/height)*std::tan(fovV),
+        ((2*(screenCoord.x+0.5) - width)/width)*std::tan(fovH),
+        -((2*(screenCoord.y+0.5) - height)/height)*std::tan(fovV),
         -1.0
     );
 }

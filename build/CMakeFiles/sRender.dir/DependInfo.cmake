@@ -4,18 +4,18 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/Users/samcordingley/dev/sRender/src/brdfs/diffuse.cpp" "/Users/samcordingley/dev/sRender/build/CMakeFiles/sRender.dir/src/brdfs/diffuse.cpp.o"
-  "/Users/samcordingley/dev/sRender/src/brdfs/mirror.cpp" "/Users/samcordingley/dev/sRender/build/CMakeFiles/sRender.dir/src/brdfs/mirror.cpp.o"
-  "/Users/samcordingley/dev/sRender/src/core/brdf.cpp" "/Users/samcordingley/dev/sRender/build/CMakeFiles/sRender.dir/src/core/brdf.cpp.o"
-  "/Users/samcordingley/dev/sRender/src/core/camera.cpp" "/Users/samcordingley/dev/sRender/build/CMakeFiles/sRender.dir/src/core/camera.cpp.o"
-  "/Users/samcordingley/dev/sRender/src/core/geometry.cpp" "/Users/samcordingley/dev/sRender/build/CMakeFiles/sRender.dir/src/core/geometry.cpp.o"
-  "/Users/samcordingley/dev/sRender/src/core/integrator.cpp" "/Users/samcordingley/dev/sRender/build/CMakeFiles/sRender.dir/src/core/integrator.cpp.o"
-  "/Users/samcordingley/dev/sRender/src/core/sampler.cpp" "/Users/samcordingley/dev/sRender/build/CMakeFiles/sRender.dir/src/core/sampler.cpp.o"
-  "/Users/samcordingley/dev/sRender/src/core/smath.cpp" "/Users/samcordingley/dev/sRender/build/CMakeFiles/sRender.dir/src/core/smath.cpp.o"
-  "/Users/samcordingley/dev/sRender/src/main.cpp" "/Users/samcordingley/dev/sRender/build/CMakeFiles/sRender.dir/src/main.cpp.o"
-  "/Users/samcordingley/dev/sRender/src/samplers/pixelsampler.cpp" "/Users/samcordingley/dev/sRender/build/CMakeFiles/sRender.dir/src/samplers/pixelsampler.cpp.o"
+  "/home/sam/dev/sRender/src/brdfs/diffuse.cpp" "/home/sam/dev/sRender/build/CMakeFiles/sRender.dir/src/brdfs/diffuse.cpp.o"
+  "/home/sam/dev/sRender/src/brdfs/mirror.cpp" "/home/sam/dev/sRender/build/CMakeFiles/sRender.dir/src/brdfs/mirror.cpp.o"
+  "/home/sam/dev/sRender/src/core/brdf.cpp" "/home/sam/dev/sRender/build/CMakeFiles/sRender.dir/src/core/brdf.cpp.o"
+  "/home/sam/dev/sRender/src/core/camera.cpp" "/home/sam/dev/sRender/build/CMakeFiles/sRender.dir/src/core/camera.cpp.o"
+  "/home/sam/dev/sRender/src/core/geometry.cpp" "/home/sam/dev/sRender/build/CMakeFiles/sRender.dir/src/core/geometry.cpp.o"
+  "/home/sam/dev/sRender/src/core/integrator.cpp" "/home/sam/dev/sRender/build/CMakeFiles/sRender.dir/src/core/integrator.cpp.o"
+  "/home/sam/dev/sRender/src/core/sampler.cpp" "/home/sam/dev/sRender/build/CMakeFiles/sRender.dir/src/core/sampler.cpp.o"
+  "/home/sam/dev/sRender/src/core/smath.cpp" "/home/sam/dev/sRender/build/CMakeFiles/sRender.dir/src/core/smath.cpp.o"
+  "/home/sam/dev/sRender/src/main.cpp" "/home/sam/dev/sRender/build/CMakeFiles/sRender.dir/src/main.cpp.o"
+  "/home/sam/dev/sRender/src/samplers/pixelsampler.cpp" "/home/sam/dev/sRender/build/CMakeFiles/sRender.dir/src/samplers/pixelsampler.cpp.o"
   )
-set(CMAKE_CXX_COMPILER_ID "Clang")
+set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH

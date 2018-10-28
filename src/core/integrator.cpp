@@ -7,7 +7,7 @@ std::mt19937 mt;
 std::uniform_real_distribution<double> uniform;
 
 Integrator::Integrator() {
-   maxDepth = 15;
+   maxDepth = 20;
 }
 
 Vector3 Integrator::getRadiance(Ray ray, int depth, std::vector<Shape*> scene) {
@@ -35,7 +35,7 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, std::vector<Shape*> scene) {
     }
 
     if (!intersectionFound) {
-        return Vector3();
+        return Vector3(2000,2000,2000);
     }
     if (intersectedObject->isLight) {
         return intersectedObject->colour;
@@ -52,6 +52,6 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, std::vector<Shape*> scene) {
         return Vector3();
     }
 
-    return getRadiance(newRay, depth+1, scene) * intersectedObject->colour / (intersectedObject->brdf->pdf * p);
+    return getRadiance(newRay, depth+1, scene) * intersectedObject->colour / (intersectedObject->brdf->pdfDividedByCos * p);
 
 }

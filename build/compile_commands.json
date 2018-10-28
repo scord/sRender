@@ -1,52 +1,52 @@
 [
 {
-  "directory": "/Users/samcordingley/dev/sRender/build",
-  "command": "/usr/bin/clang++    -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/core/smath.cpp.o -c /Users/samcordingley/dev/sRender/src/core/smath.cpp",
-  "file": "/Users/samcordingley/dev/sRender/src/core/smath.cpp"
+  "directory": "/home/sam/dev/sRender/build",
+  "command": "/usr/bin/c++     -pthread -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/core/smath.cpp.o -c /home/sam/dev/sRender/src/core/smath.cpp",
+  "file": "/home/sam/dev/sRender/src/core/smath.cpp"
 },
 {
-  "directory": "/Users/samcordingley/dev/sRender/build",
-  "command": "/usr/bin/clang++    -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/main.cpp.o -c /Users/samcordingley/dev/sRender/src/main.cpp",
-  "file": "/Users/samcordingley/dev/sRender/src/main.cpp"
+  "directory": "/home/sam/dev/sRender/build",
+  "command": "/usr/bin/c++     -pthread -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/main.cpp.o -c /home/sam/dev/sRender/src/main.cpp",
+  "file": "/home/sam/dev/sRender/src/main.cpp"
 },
 {
-  "directory": "/Users/samcordingley/dev/sRender/build",
-  "command": "/usr/bin/clang++    -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/core/camera.cpp.o -c /Users/samcordingley/dev/sRender/src/core/camera.cpp",
-  "file": "/Users/samcordingley/dev/sRender/src/core/camera.cpp"
+  "directory": "/home/sam/dev/sRender/build",
+  "command": "/usr/bin/c++     -pthread -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/core/camera.cpp.o -c /home/sam/dev/sRender/src/core/camera.cpp",
+  "file": "/home/sam/dev/sRender/src/core/camera.cpp"
 },
 {
-  "directory": "/Users/samcordingley/dev/sRender/build",
-  "command": "/usr/bin/clang++    -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/core/sampler.cpp.o -c /Users/samcordingley/dev/sRender/src/core/sampler.cpp",
-  "file": "/Users/samcordingley/dev/sRender/src/core/sampler.cpp"
+  "directory": "/home/sam/dev/sRender/build",
+  "command": "/usr/bin/c++     -pthread -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/core/sampler.cpp.o -c /home/sam/dev/sRender/src/core/sampler.cpp",
+  "file": "/home/sam/dev/sRender/src/core/sampler.cpp"
 },
 {
-  "directory": "/Users/samcordingley/dev/sRender/build",
-  "command": "/usr/bin/clang++    -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/samplers/pixelsampler.cpp.o -c /Users/samcordingley/dev/sRender/src/samplers/pixelsampler.cpp",
-  "file": "/Users/samcordingley/dev/sRender/src/samplers/pixelsampler.cpp"
+  "directory": "/home/sam/dev/sRender/build",
+  "command": "/usr/bin/c++     -pthread -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/samplers/pixelsampler.cpp.o -c /home/sam/dev/sRender/src/samplers/pixelsampler.cpp",
+  "file": "/home/sam/dev/sRender/src/samplers/pixelsampler.cpp"
 },
 {
-  "directory": "/Users/samcordingley/dev/sRender/build",
-  "command": "/usr/bin/clang++    -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/core/geometry.cpp.o -c /Users/samcordingley/dev/sRender/src/core/geometry.cpp",
-  "file": "/Users/samcordingley/dev/sRender/src/core/geometry.cpp"
+  "directory": "/home/sam/dev/sRender/build",
+  "command": "/usr/bin/c++     -pthread -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/core/geometry.cpp.o -c /home/sam/dev/sRender/src/core/geometry.cpp",
+  "file": "/home/sam/dev/sRender/src/core/geometry.cpp"
 },
 {
-  "directory": "/Users/samcordingley/dev/sRender/build",
-  "command": "/usr/bin/clang++    -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/core/integrator.cpp.o -c /Users/samcordingley/dev/sRender/src/core/integrator.cpp",
-  "file": "/Users/samcordingley/dev/sRender/src/core/integrator.cpp"
+  "directory": "/home/sam/dev/sRender/build",
+  "command": "/usr/bin/c++     -pthread -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/core/integrator.cpp.o -c /home/sam/dev/sRender/src/core/integrator.cpp",
+  "file": "/home/sam/dev/sRender/src/core/integrator.cpp"
 },
 {
-  "directory": "/Users/samcordingley/dev/sRender/build",
-  "command": "/usr/bin/clang++    -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/core/brdf.cpp.o -c /Users/samcordingley/dev/sRender/src/core/brdf.cpp",
-  "file": "/Users/samcordingley/dev/sRender/src/core/brdf.cpp"
+  "directory": "/home/sam/dev/sRender/build",
+  "command": "/usr/bin/c++     -pthread -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/core/brdf.cpp.o -c /home/sam/dev/sRender/src/core/brdf.cpp",
+  "file": "/home/sam/dev/sRender/src/core/brdf.cpp"
 },
 {
-  "directory": "/Users/samcordingley/dev/sRender/build",
-  "command": "/usr/bin/clang++    -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/brdfs/diffuse.cpp.o -c /Users/samcordingley/dev/sRender/src/brdfs/diffuse.cpp",
-  "file": "/Users/samcordingley/dev/sRender/src/brdfs/diffuse.cpp"
+  "directory": "/home/sam/dev/sRender/build",
+  "command": "/usr/bin/c++     -pthread -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/brdfs/diffuse.cpp.o -c /home/sam/dev/sRender/src/brdfs/diffuse.cpp",
+  "file": "/home/sam/dev/sRender/src/brdfs/diffuse.cpp"
 },
 {
-  "directory": "/Users/samcordingley/dev/sRender/build",
-  "command": "/usr/bin/clang++    -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/brdfs/mirror.cpp.o -c /Users/samcordingley/dev/sRender/src/brdfs/mirror.cpp",
-  "file": "/Users/samcordingley/dev/sRender/src/brdfs/mirror.cpp"
+  "directory": "/home/sam/dev/sRender/build",
+  "command": "/usr/bin/c++     -pthread -g   -std=gnu++1z -o CMakeFiles/sRender.dir/src/brdfs/mirror.cpp.o -c /home/sam/dev/sRender/src/brdfs/mirror.cpp",
+  "file": "/home/sam/dev/sRender/src/brdfs/mirror.cpp"
 }
 ]

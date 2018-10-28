@@ -7,6 +7,6 @@ class Brdf {
 public:
     Brdf();
     std::random_device rd;
-    double pdf;
+    double pdfDividedByCos;
     virtual Ray Sample(Ray ray, Vector3 p, Vector3 n) = 0;
 };

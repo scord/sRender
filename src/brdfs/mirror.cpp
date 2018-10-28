@@ -1,7 +1,7 @@
 #include "mirror.h"
 
 MirrorBrdf::MirrorBrdf(){
-    pdf = 1.0;
+    pdfDividedByCos = 1.0;
 }
 
 Ray MirrorBrdf::Sample(Ray ray, Vector3 p, Vector3 n) {

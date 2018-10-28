@@ -177,7 +177,11 @@ double Vector3::length() const {
 
 Vector3 Vector3::norm() {
     double len = length();
-    return Vector3(x/len, y/len, z/len);
+    if (len == 0 ) {
+        return Vector3();
+    } else {
+        return Vector3(x/len, y/len, z/len);
+    }
 }
 
 Vector3 Vector3::clamp() {

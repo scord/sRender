@@ -13,7 +13,7 @@ Vector3 circleToHemisphere(double u1, double u2) {
 }
 
 DiffuseBrdf::DiffuseBrdf(){
-    pdf = 0.3;
+    pdfDividedByCos = 2;
 }
 
 Ray DiffuseBrdf::Sample(Ray ray, Vector3 p, Vector3 n) {
