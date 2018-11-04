@@ -1,9 +1,140 @@
 #include "geometry.h"
 #include "../core/smath.h"
+#include <cmath>
 
 
-Shape::Shape(Vector3 p0, Vector3 colour, Brdf* brdf) : p0(p0), colour(colour), isLight(false), objectToWorld(Transform(p0, Vector3(), Vector3())) {
+Triangle::Triangle(Vector3 v0, Vector3 v1, Vector3 v2, Vector3 colour, Brdf* brdf) : Shape(v0, colour, brdf), v1(v1), v2(v2) {
+    n = (v1 - v0).cross(v2 - v0).norm();
     this->brdf = brdf;
+    aabb = calculateBoundingBox();
+}
+
+Vector3 Triangle::samplePoint() {
+
+}
+Vector3 Disc::samplePoint() {
+    
+}
+Vector3 Quad::samplePoint() {
+    
+}
+Vector3 Sphere::samplePoint() {
+    
+}
+Vector3 Plane::samplePoint() {
+    
+}
+
+
+Vector3 Triangle::normal(Vector3 p) {
+    return n;
+}
+
+
+double Triangle::Intersect(Ray ray, Vector3& intersection2) {
+
+    Vector3 tv0 = p0;
+    Vector3 tv1 = v1;
+    Vector3 tv2 = v2;
+
+    double np = ray.direction.dot(n);
+    double t = (tv0.dot(n)-ray.origin.dot(n))/np;
+    Vector3 intersection = ray.origin + ray.direction*t;
+    
+    Vector3 edge0 = tv1 - tv0;
+    Vector3 vp0 = intersection - tv0;
+    if (n.dot(edge0.cross(vp0)) < 0) return -1;
+
+    Vector3 edge1 = tv2 - tv1;
+    Vector3 vp1 = intersection - tv1;
+    if (n.dot(edge1.cross(vp1)) < 0) return -1;
+
+    Vector3 edge2 = tv0 - tv2;
+    Vector3 vp2 = intersection - tv2;
+    if (n.dot(edge2.cross(vp2)) < 0) return -1;
+
+    return t;
+}
+
+BoundingBox::BoundingBox(Vector3 min, Vector3 max) : min(min), max(max) {}
+
+bool BoundingBox::overlaps(BoundingBox box) {
+    if (contains(box.min) || contains(box.max)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool BoundingBox::contains(Vector3 p) {
+    if (p.x >= min.x && p.y >= min.y && p.z >= min.z && p.x <= max.x && p.y <= max.y && p.z <= max.z) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool BoundingBox::intersects(Ray ray) {
+
+    double txmin, tymin, tzmin;
+    double txmax, tymax, tzmax;
+
+    if (ray.direction.x >= 0) {
+        txmin = (min.x - ray.origin.x) / ray.direction.x;
+        txmax = (max.x - ray.origin.x) / ray.direction.x;
+    } else {
+        txmax = (min.x - ray.origin.x) / ray.direction.x;
+        txmin = (max.x - ray.origin.x) / ray.direction.x;
+    }
+
+    if (ray.direction.y >= 0) {
+        tymin = (min.y - ray.origin.y) / ray.direction.y;
+        tymax = (max.y - ray.origin.y) / ray.direction.y;
+    } else {
+        tymax = (min.y - ray.origin.y) / ray.direction.y;
+        tymin = (max.y - ray.origin.y) / ray.direction.y;
+    }
+
+    if ((txmin > tymax) || (tymin > txmax))
+        return false;
+    if (tymin > txmin)
+        txmin = tymin;
+    if (tymax < txmax)
+        txmax = tymax;
+
+    if (ray.direction.z >= 0) {
+        tzmin = (min.z - ray.origin.z) / ray.direction.z;
+        tzmax = (max.z - ray.origin.z) / ray.direction.z;
+    } else {
+        tzmax = (min.z - ray.origin.z) / ray.direction.z;
+        tzmin = (max.z - ray.origin.z) / ray.direction.z;
+    }
+    if ((txmin > tzmax) || (tzmin > txmax))
+        return false;
+    if (tzmin > txmin)
+        txmin = tzmin;
+    if (tzmax < txmax)
+        txmax = tzmax;
+
+    return true; 
+}
+
+BoundingBox Triangle::calculateBoundingBox() {
+    float minX = std::min(p0.x, std::min(v1.x, v2.x));
+    float minY = std::min(p0.y, std::min(v1.y, v2.y));
+    float minZ = std::min(p0.z, std::min(v1.z, v2.z));
+
+    float maxX = std::max(p0.x, std::max(v1.x, v2.x));
+    float maxY = std::max(p0.y, std::max(v1.y, v2.y));
+    float maxZ = std::max(p0.z, std::max(v1.z, v2.z));
+
+    return BoundingBox(Vector3(minX,minY,minZ),
+                       Vector3(maxX,maxY,maxZ));
+}
+
+Shape::Shape(Vector3 p0, Vector3 colour, Brdf* brdf) : p0(p0), colour(colour), isLight(false), objectToWorld(Transform(Vector3(0,0,0), Vector3(1,1,1), Vector3())), aabb(BoundingBox(Vector3(),Vector3())) {
+    this->brdf = brdf;
+
 }
 
 Plane::Plane(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf) : Shape(p0, colour, brdf), n(n) {
@@ -28,6 +159,11 @@ double Plane::Intersect(Ray ray, Vector3& intersection) {
     return t;
 }
 
+BoundingBox Plane::calculateBoundingBox() {
+    return BoundingBox(Vector3(), Vector3());
+}
+
+
 Disc::Disc(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf, Vector2 size) : Plane(p0, n, colour, brdf), size(size) {}
 
 double Disc::Intersect(Ray ray, Vector3& intersection) {
@@ -39,9 +175,17 @@ double Disc::Intersect(Ray ray, Vector3& intersection) {
     }
 }
 
+BoundingBox Disc::calculateBoundingBox() {
+    return BoundingBox(Vector3(), Vector3());
+}
+
 Quad::Quad(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf, Vector2 size, Vector3 up) : Plane(p0, n, colour, brdf), size(size) {
     this->up = up;
     left = up.cross(n);
+}
+
+BoundingBox Quad::calculateBoundingBox() {
+    return BoundingBox(Vector3(), Vector3());
 }
 
 double Quad::Intersect(Ray ray, Vector3& intersection) {
@@ -73,6 +217,10 @@ double Sphere::Intersect(Ray ray, Vector3& intersection) {
     intersection = ray.origin + ray.direction*t;
     return t;
 
+}
+
+BoundingBox Sphere::calculateBoundingBox() {
+    return BoundingBox(Vector3(), Vector3());
 }
 
 Vector3 Sphere::normal(Vector3 p) {

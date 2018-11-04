@@ -13,40 +13,61 @@
 #include <chrono>
 #include <iostream>
 #include "core/tonemapper.h"
+#include "io/plyreader.h"
+#include "core/scene.h"
 
 #define PI 3.1415926536
 
-std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, std::vector<Shape*> scene, int samplesPerPixel, std::vector<std::vector<PixelSampler>> pixelSamplers);
+std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, std::vector<std::vector<PixelSampler>> pixelSamplers);
 
 int main() {
 
-	Camera cam(Vector3(0,0,0.9), 300, 300, PI/4);
+	Camera cam(Vector3(0,0,0.9), 420, 420, PI/4);
 
-	std::vector<Shape*> scene;
+	Scene scene;
+
+	PLYReader reader("/home/sam/dev/sRender/src/dragon.ply");
+
+	//scene.add(reader.toObject(Vector3(-0.25,-1,-0.5), 4));
+
+	KDTreeObject* bunny = reader.toKDTreeObject(Vector3(0,-1.6,-0.5), 10);
+
+	scene.add(bunny);
 
 	// ROOM
-	scene.push_back(new Quad(Vector3(0,0,1), Vector3(0,0,-1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,1,0)));;
-	scene.push_back(new Quad(Vector3(0,1,0), Vector3(0,-1,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
-	scene.push_back(new Quad(Vector3(0,-1,0), Vector3(0,1,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
-	scene.push_back(new Quad(Vector3(0,0,-1), Vector3(0,0,1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,1,0)));
-	scene.push_back(new Quad(Vector3(1,0,0), Vector3(-1,0,0), Vector3(1,0,0), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
-	scene.push_back(new Quad(Vector3(-1,0,0), Vector3(1,0,0), Vector3(0,1,0), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
+	std::vector<Shape*> roomGeometry;
 
+	roomGeometry.push_back(new Quad(Vector3(0,0,1), Vector3(0,0,-1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,1,0)));
+	roomGeometry.push_back(new Quad(Vector3(0,1,0), Vector3(0,-1,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
+	roomGeometry.push_back(new Quad(Vector3(0,-1,0), Vector3(0,1,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
+	roomGeometry.push_back(new Quad(Vector3(0,0,-1), Vector3(0,0,1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,1,0)));
+	roomGeometry.push_back(new Quad(Vector3(1,0,0), Vector3(-1,0,0), Vector3(1,0,0), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
+	roomGeometry.push_back(new Quad(Vector3(-1,0,0), Vector3(1,0,0), Vector3(0,1,0), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
+
+	scene.add(new Object(roomGeometry, Vector3(0,0,0), 1));
 	// BOX
-	scene.push_back(new Quad(Vector3(-0.5,0.1,-0.5), Vector3(0,1,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(0.25,0.25), Vector3(0,0,-1)));
-	scene.push_back(new Quad(Vector3(-0.75,-0.45,-0.5), Vector3(-1,0,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(0.25,0.55), Vector3(0,1,0)));
-	scene.push_back(new Quad(Vector3(-0.25,-0.45,-0.5), Vector3(1,0,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(0.25,0.55), Vector3(0,1,0)));
-	scene.push_back(new Quad(Vector3(-0.5,-0.45,-0.25), Vector3(0,0,1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(0.25,0.55), Vector3(0,1,0)));
-	scene.push_back(new Quad(Vector3(-0.5,-0.45,-0.75), Vector3(0,0,-1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(0.25,0.55), Vector3(0,1,0)));
+	//scene.push_back(new Quad(Vector3(-0.5,0.1,-0.5), Vector3(0,1,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(0.25,0.25), Vector3(0,0,-1)));
+	//scene.push_back(new Quad(Vector3(-0.75,-0.45,-0.5), Vector3(-1,0,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(0.25,0.55), Vector3(0,1,0)));
+	//scene.push_back(new Quad(Vector3(-0.25,-0.45,-0.5), Vector3(1,0,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(0.25,0.55), Vector3(0,1,0)));
+	//scene.push_back(new Quad(Vector3(-0.5,-0.45,-0.25), Vector3(0,0,1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(0.25,0.55), Vector3(0,1,0)));
+	//scene.push_back(new Quad(Vector3(-0.5,-0.45,-0.75), Vector3(0,0,-1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(0.25,0.55), Vector3(0,1,0)));
 
 	// SPHERE
-	scene.push_back(new Sphere(Vector3(0.5, -0.7, -0.55), Vector3(1,1,1), new MirrorBrdf(), 0.3));
+	//scene.push_back(new Sphere(Vector3(0.5, -0.7, -0.55), Vector3(1,1,1), new MirrorBrdf(), 0.3));
 
+	
+	Triangle* triangleTest = new Triangle(Vector3(-1,-1,-1), Vector3(-1,1,-1), Vector3(1,1,-1), Vector3(10000,10000,10000), new DiffuseBrdf());
+	triangleTest->isLight = true;
+	//scene.push_back(triangleTest);
 	// LIGHT
-	Disc* areaLight = new Disc(Vector3(0,0.999,0), Vector3(0,-1,0), Vector3(10000,9800,9500), new DiffuseBrdf(), Vector2(0.25,0.25));
+
+	Shape* areaLight = new Disc(Vector3(0,0.999,0), Vector3(0,-1,0), Vector3(10000,9800,9500), new DiffuseBrdf(), Vector2(0.5,0.5));
 	areaLight->isLight = true;
 
-	scene.push_back(areaLight);
+	std::vector<Shape*> lightGeometry;
+	lightGeometry.push_back(areaLight);
+	
+	scene.add(new Object(lightGeometry, Vector3(0,0,0), 1));
 
 	std::vector<std::vector<Vector3>> image;
 
@@ -65,7 +86,7 @@ int main() {
 	
 	// prepare tiles
 
-	int tileCount = std::thread::hardware_concurrency();
+	int tileCount = std::thread::hardware_concurrency() - 1;
 	int tileWidth = cam.width/tileCount;
 	std::vector<std::vector<std::vector<Vector3>>> tiles;
 
@@ -139,7 +160,7 @@ int main() {
 }
 
 
-std::vector<std::vector<Vector3>> renderTile(int tileNumber, std::vector<std::vector<Vector3>> tile, Camera cam, std::vector<Shape*> scene, int samplesPerPixel, std::vector<std::vector<PixelSampler>> pixelSamplers) {
+std::vector<std::vector<Vector3>> renderTile(int tileNumber, std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, std::vector<std::vector<PixelSampler>> pixelSamplers) {
 
 	Integrator pathTracer;
 

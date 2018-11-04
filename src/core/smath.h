@@ -71,8 +71,11 @@ struct Matrix4 {
 
 struct Transform {
     Matrix4 matrix;
+    Matrix4 inverse;
+    Matrix4 setMatrix(Vector3 p, Vector3 s, Vector3 r);
     Transform(Vector3 p, Vector3 s, Vector3 r);
     Vector3 apply(Vector3 v);
+    Vector3 applyInverse(Vector3 v);
 };
 
 

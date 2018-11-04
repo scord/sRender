@@ -1,6 +1,12 @@
 #include "smath.h"
 
-Transform::Transform(Vector3 p, Vector3 r, Vector3 s) {
+
+Transform::Transform(Vector3 p, Vector3 s, Vector3 r) {
+    inverse = setMatrix((Vector3()-p)*Vector3(1/s.x, 1/s.y,1/s.z),Vector3(1/s.x, 1/s.y, 1/s.z),Vector3()-r);
+    matrix = setMatrix(p, s, r);
+}
+
+Matrix4 Transform::setMatrix(Vector3 p, Vector3 s, Vector3 r) {
     Matrix4 matrixTS;
 
     matrixTS.set(0, 0, s.x);
@@ -22,27 +28,34 @@ Transform::Transform(Vector3 p, Vector3 r, Vector3 s) {
 
     Matrix4 matrixRy;
 
-    matrixRx.set(1, 1, 1);
-    matrixRx.set(0, 0, cos(r.y));
-    matrixRx.set(0, 2, -sin(r.y));
-    matrixRx.set(2, 0, sin(r.y));
-    matrixRx.set(2, 2, cos(r.y));
-    matrixRx.set(3, 3, 1);
+    matrixRy.set(1, 1, 1);
+    matrixRy.set(0, 0, cos(r.y));
+    matrixRy.set(0, 2, -sin(r.y));
+    matrixRy.set(2, 0, sin(r.y));
+    matrixRy.set(2, 2, cos(r.y));
+    matrixRy.set(3, 3, 1);
 
     Matrix4 matrixRz;
 
-    matrixRx.set(2, 2, 1);
-    matrixRx.set(0, 0, cos(r.x));
-    matrixRx.set(0, 1, -sin(r.x));
-    matrixRx.set(1, 0, sin(r.x));
-    matrixRx.set(1, 1, cos(r.x));
-    matrixRx.set(3, 3, 1);
+    matrixRz.set(2, 2, 1);
+    matrixRz.set(0, 0, cos(r.z));
+    matrixRz.set(0, 1, -sin(r.z));
+    matrixRz.set(1, 0, sin(r.z));
+    matrixRz.set(1, 1, cos(r.z));
+    matrixRz.set(3, 3, 1);
 
-    matrix = matrixTS * matrixRx * matrixRy * matrixRz;
+    return matrixTS * matrixRx * matrixRy * matrixRz;
 }
+
+
 
 Vector3 Transform::apply(Vector3 v) {
     Vector4 v4 = matrix*Vector4(v, 1);
+    return Vector3(v4.x, v4.y, v4.z);
+}
+
+Vector3 Transform::applyInverse(Vector3 v) {
+    Vector4 v4 = inverse*Vector4(v, 1);
     return Vector3(v4.x, v4.y, v4.z);
 }
 
@@ -62,7 +75,7 @@ Vector4 Matrix4::operator*(Vector4 v) const {
 
     result.x = this->row(0).dot(v);
     result.y = this->row(1).dot(v);
-    result.z = this->row(1).dot(v);
+    result.z = this->row(2).dot(v);
     result.w = 1;
 
     return result;
