@@ -56,6 +56,42 @@ double Triangle::Intersect(Ray ray, Vector3& intersection2) {
     return t;
 }
 
+void Triangle::transform(Vector3 position, Vector3 scale) {
+    p0.x *= scale.x;
+    p0.y *= scale.y;
+    p0.z *= scale.z;
+    p0.x += position.x;
+    p0.y += position.y;
+    p0.z += position.z;
+
+    v1.x *= scale.x;
+    v1.y *= scale.y;
+    v1.z *= scale.z;
+    v1.x += position.x;
+    v1.y += position.y;
+    v1.z += position.z;
+
+    v2.x *= scale.x;
+    v2.y *= scale.y;
+    v2.z *= scale.z;
+    v2.x += position.x;
+    v2.y += position.y;
+    v2.z += position.z;
+
+    aabb.transform(position, scale);
+}
+
+void BoundingBox::transform(Vector3 position, Vector3 scale) {
+    min.x *= scale.x;
+    min.y *= scale.y;
+    min.z *= scale.z;
+    min += position;
+
+    max.x *= scale.x;
+    max.y *= scale.y;
+    max.z *= scale.z;
+    max += position;
+}
 BoundingBox::BoundingBox(Vector3 min, Vector3 max) : min(min), max(max) {}
 
 bool BoundingBox::overlaps(BoundingBox box) {
@@ -163,6 +199,11 @@ BoundingBox Plane::calculateBoundingBox() {
     return BoundingBox(Vector3(), Vector3());
 }
 
+void Plane::transform(Vector3 position, Vector3 scale) {
+    p0 += position;
+}
+
+
 
 Disc::Disc(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf, Vector2 size) : Plane(p0, n, colour, brdf), size(size) {}
 
@@ -178,6 +219,13 @@ double Disc::Intersect(Ray ray, Vector3& intersection) {
 BoundingBox Disc::calculateBoundingBox() {
     return BoundingBox(Vector3(), Vector3());
 }
+
+void Disc::transform(Vector3 position, Vector3 scale) {
+    p0 += position;
+    size.x *= scale.x;
+    size.y *= scale.y;
+}
+
 
 Quad::Quad(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf, Vector2 size, Vector3 up) : Plane(p0, n, colour, brdf), size(size) {
     this->up = up;
@@ -199,6 +247,12 @@ double Quad::Intersect(Ray ray, Vector3& intersection) {
     }
 }
 
+void Quad::transform(Vector3 position, Vector3 scale) {
+    p0 += position;
+    size.x *= scale.x;
+    size.y *= scale.y;
+}
+
 Sphere::Sphere(Vector3 p0, Vector3 colour, Brdf* brdf, double r) : Shape(p0, colour, brdf), radius(r) {}
 
 double Sphere::Intersect(Ray ray, Vector3& intersection) {
@@ -217,6 +271,11 @@ double Sphere::Intersect(Ray ray, Vector3& intersection) {
     intersection = ray.origin + ray.direction*t;
     return t;
 
+}
+
+void Sphere::transform(Vector3 position, Vector3 scale) {
+    p0 += position;
+    radius *= scale.x;
 }
 
 BoundingBox Sphere::calculateBoundingBox() {

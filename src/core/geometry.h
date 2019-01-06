@@ -8,10 +8,12 @@ class BoundingBox {
 public:
     Vector3 min;
     Vector3 max;
+    BoundingBox() {};
     BoundingBox(Vector3 min, Vector3 max);
     bool contains(Vector3 p);
     bool intersects(Ray ray);
     bool overlaps(BoundingBox box);
+    void transform(Vector3 position, Vector3 scale);
 };
 
 class Shape {
@@ -29,6 +31,7 @@ public:
     virtual Vector3 samplePoint() = 0;
     virtual Vector3 normal(Vector3 p) = 0;
     virtual double Intersect(Ray ray, Vector3 &intersection) = 0;
+    virtual void transform(Vector3 position, Vector3 scale) = 0;
 };
 
 
@@ -43,6 +46,7 @@ public:
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
     virtual double Intersect(Ray ray, Vector3& intersection);
+    virtual void transform(Vector3 position, Vector3 scale);
 };
 
 
@@ -56,6 +60,7 @@ public:
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
     virtual double Intersect(Ray ray, Vector3 &intersection);
+    virtual void transform(Vector3 position, Vector3 scale);
 };
 
 class Disc : public Plane {
@@ -65,6 +70,7 @@ public:
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
     virtual double Intersect(Ray ray, Vector3 &intersection);
+    virtual void transform(Vector3 position, Vector3 scale);
 };
 
 class Quad : public Plane {
@@ -74,6 +80,7 @@ public:
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
     virtual double Intersect(Ray ray, Vector3 &intersection);
+    virtual void transform(Vector3 position, Vector3 scale);
 };
 
 class Sphere : public Shape {
@@ -84,4 +91,5 @@ public:
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
     virtual double Intersect(Ray ray, Vector3 &intersection);
+    virtual void transform(Vector3 position, Vector3 scale);
 };

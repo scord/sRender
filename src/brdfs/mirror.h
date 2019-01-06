@@ -6,6 +6,8 @@
 
 class MirrorBrdf : public Brdf {
 public:
-    MirrorBrdf();
-    virtual Ray Sample(Ray ray, Vector3 p, Vector3 n);
+    MirrorBrdf() {};
+    Sample3D sample;
+    virtual Vector3 getValue(Vector3 albedo);
+    virtual Ray getRay(Ray ray, Vector3 p, Vector3 n);
 };

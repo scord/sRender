@@ -1,15 +1,18 @@
 #pragma once
 
-#include "smath.h"
+#include <vector>
+#include "../core/smath.h"
+#include "sample.h"
+#include <random>
 
 class Sampler {
 public:
-    int samplesPerPixel;
-    Sampler(int samplesPerPixel);
-    virtual double getdoubleSample() = 0;
-    virtual Vector2 getVectorSample() = 0;
-
-    Vector2 getPixelSample(const Vector2 &p);
-
-
+    Sampler() {};
+    Sampler(int nSamples);
+    Sample2D getSample();
+    int sampleNumber;
+    int nSamples;
+    void generateTestImage(const int width, const int height);
+protected:
+    std::vector<Sample2D> vectorSamples;
 };

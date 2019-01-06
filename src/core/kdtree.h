@@ -5,6 +5,7 @@
 
 class KDTreeNode {
 public:
+    KDTreeNode() {};
     KDTreeNode(BoundingBox box, std::vector<Shape*> geometry, int splitAxis);
     BoundingBox aabb;
     KDTreeNode* left;

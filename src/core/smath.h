@@ -2,6 +2,10 @@
 #include <cmath>
 #include <vector>
 
+const double PI = 3.141592653589793238463;
+const double TAU = 2*PI;
+const double IPI = 1/PI;
+
 struct Vector3 {
     double x, y, z;
     Vector3();
@@ -73,6 +77,7 @@ struct Transform {
     Matrix4 matrix;
     Matrix4 inverse;
     Matrix4 setMatrix(Vector3 p, Vector3 s, Vector3 r);
+    Transform() {};
     Transform(Vector3 p, Vector3 s, Vector3 r);
     Vector3 apply(Vector3 v);
     Vector3 applyInverse(Vector3 v);

@@ -1,7 +1,7 @@
 #include "core/smath.h"
 #include "core/camera.h"
 #include <stdio.h>
-#include "samplers/pixelsampler.h"
+#include "core/sampler.h"
 #include <algorithm>
 #include <vector>
 #include "core/geometry.h"
@@ -15,14 +15,15 @@
 #include "core/tonemapper.h"
 #include "io/plyreader.h"
 #include "core/scene.h"
+#include "samplers/pixelsampler.h"
 
 #define PI 3.1415926536
 
-std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, std::vector<std::vector<PixelSampler>> pixelSamplers);
+std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth);
 
 int main() {
 
-	Camera cam(Vector3(0,0,0.9), 420, 420, PI/4);
+	Camera cam(Vector3(0,0,1.5), 180, 180, PI/4);
 
 	Scene scene;
 
@@ -30,14 +31,14 @@ int main() {
 
 	//scene.add(reader.toObject(Vector3(-0.25,-1,-0.5), 4));
 
-	KDTreeObject* bunny = reader.toKDTreeObject(Vector3(0,-1.6,-0.5), 10);
+	KDTreeObject* bunny = reader.toKDTreeObject(Vector3(0,-1.5,0), 8);
 
 	scene.add(bunny);
 
 	// ROOM
 	std::vector<Shape*> roomGeometry;
 
-	roomGeometry.push_back(new Quad(Vector3(0,0,1), Vector3(0,0,-1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,1,0)));
+
 	roomGeometry.push_back(new Quad(Vector3(0,1,0), Vector3(0,-1,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
 	roomGeometry.push_back(new Quad(Vector3(0,-1,0), Vector3(0,1,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
 	roomGeometry.push_back(new Quad(Vector3(0,0,-1), Vector3(0,0,1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,1,0)));
@@ -53,7 +54,12 @@ int main() {
 	//scene.push_back(new Quad(Vector3(-0.5,-0.45,-0.75), Vector3(0,0,-1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(0.25,0.55), Vector3(0,1,0)));
 
 	// SPHERE
-	//scene.push_back(new Sphere(Vector3(0.5, -0.7, -0.55), Vector3(1,1,1), new MirrorBrdf(), 0.3));
+
+	std::vector<Shape*> sphereGeometry;
+
+	//sphereGeometry.push_back(new Sphere(Vector3(0, 0, 0), Vector3(1,1,1), new DiffuseBrdf(), 1));
+	//sphereGeometry.push_back(new Sphere(Vector3(0, 0.7, 0), Vector3(1,1,1), new DiffuseBrdf(), 0.7));
+	//scene.add(new Object(sphereGeometry, Vector3(0,-0.5,0), 0.5));
 
 	
 	Triangle* triangleTest = new Triangle(Vector3(-1,-1,-1), Vector3(-1,1,-1), Vector3(1,1,-1), Vector3(10000,10000,10000), new DiffuseBrdf());
@@ -78,15 +84,13 @@ int main() {
         }
     }
 
-	Integrator pathTracer;
-
-	int samplesPerPixel = 1024;
+	int samplesPerPixel = 512;
 	
 	auto start = std::chrono::high_resolution_clock::now();
 	
 	// prepare tiles
 
-	int tileCount = std::thread::hardware_concurrency() - 1;
+	int tileCount = 6;
 	int tileWidth = cam.width/tileCount;
 	std::vector<std::vector<std::vector<Vector3>>> tiles;
 
@@ -108,17 +112,17 @@ int main() {
 
 	for (int t = 0; t < tileCount; t++) {
 		// prepare samplers
-		std::vector<std::vector<PixelSampler>> pixelSamplers;
+		std::vector<std::vector<Sampler>> pixelSamplers;
 
 		for (int i=0; i < tileWidth; i++) {
-			pixelSamplers.push_back(std::vector<PixelSampler>());
+			pixelSamplers.push_back(std::vector<Sampler>());
 			for (int j=0; j < cam.height; j++) {
-				PixelSampler pixelSampler(samplesPerPixel);
+				Sampler pixelSampler(samplesPerPixel);
 				pixelSamplers[i].push_back(pixelSampler);
 			}
 		}
 
-		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, pixelSamplers));
+		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 5));
 	}
 
 	int k = 0;
@@ -154,26 +158,36 @@ int main() {
 	fclose(f);
 
 	//PixelSampler sampler2(4096);
-	//sampler2.GenerateTestImage(200, 200);
+	//Sampler sampler(1);
+	//sampler.generateTestImage(200, 200);
 
 	return 0;
 }
 
 
-std::vector<std::vector<Vector3>> renderTile(int tileNumber, std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, std::vector<std::vector<PixelSampler>> pixelSamplers) {
+std::vector<std::vector<Vector3>> renderTile(int tileNumber, std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth) {
 
-	Integrator pathTracer;
+	
 
 	int tileWidth = tile.size();
- 
-	for (int n=0; n < samplesPerPixel; n++) {
-		for (int i=0; i < tile.size(); i++) {
-			
-			for (int j=0; j < tile[0].size(); j++) {
+	int tileHeight = tile[0].size();
 
-				Ray ray = cam.pixelToRay(pixelSamplers[i][j].getPixelSample(Vector2(tileNumber*tileWidth+i+0.5, j+0.5)));
+	PixelSampler pixelSampler(tileWidth, tileHeight, samplesPerPixel, maxDepth);
+
+	Integrator pathTracer(pixelSampler, maxDepth);
+	for (int i=0; i < tile.size(); i++) {
+			
+		for (int j=0; j < tile[0].size(); j++) {
+
+
+			for (int n=0; n < samplesPerPixel; n++) {
+
+				
+				Ray ray = cam.pixelToRay(Vector2(tileNumber*tileWidth+i, j) + pixelSampler.getStratifiedSample().value);
+				
 				Vector3 colour = pathTracer.getRadiance(ray, 0, scene);
 				tile[i][j] += colour/samplesPerPixel;
+
 			}
 		}
 	}

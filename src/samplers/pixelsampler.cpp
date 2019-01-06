@@ -1,66 +1,59 @@
 #include "pixelsampler.h"
 #include <random>
+#include <algorithm> 
 
 
-PixelSampler::PixelSampler(int samplesPerPixel) : Sampler(samplesPerPixel) {
+
+
+PixelSampler::PixelSampler(int w, int h, int n, int d) {
+    double grid_size = sqrt(n);
     std::random_device rd;
     std::mt19937 gen(rd());
-    double grid_size = sqrt(samplesPerPixel);
-    
-    std::uniform_real_distribution<double> dis(0, 1);
+    std::uniform_real_distribution<double> dis(0,1);
 
-    // stratified sampling
-    for (int i = 0; i < grid_size; i++) {
-        for (int j = 0; j < grid_size; j++) {
-            doubleSamples.push_back(dis(gen));
-            vectorSamples.push_back(Vector2(i/grid_size + 1/(2*grid_size) + (dis(gen)-0.5)/grid_size - 0.5, j/grid_size + 1/(2*grid_size) + (dis(gen)-0.5)/grid_size -0.5));
-        }
-    }
-    
-    sampleNumber = 0;
-}
-
-double PixelSampler::getdoubleSample() {
-    return doubleSamples[sampleNumber++];
-}
-
-Vector2 PixelSampler::getVectorSample() {
-    return vectorSamples[sampleNumber++];
-}
-
-Vector2 PixelSampler::getPixelSample(const Vector2 &p) {
-    return p + getVectorSample();
-}
-
-void PixelSampler::generateTestImage(const int width, const int height) {
-    std::vector< std::vector<int> > pix;
-
-    for (int i=0; i < width; i++) {
-        pix.push_back(std::vector<int>());
-        for (int j = 0; j < height; j++) {
-            pix[i].push_back(0);
+    for (int x = 0; x < w; x++) {
+        for (int y = 0; y < h; y++) {
+            // stratified sampling
+            for (int i = 0; i < grid_size; i++) {
+                for (int j = 0; j < grid_size; j++) {
+                    stratifiedSamples.push_back(Sample2D(Vector2(i/grid_size + dis(gen)/grid_size, j/grid_size + dis(gen)/grid_size), 1));
+                    for (int k = 0; k < d; k++) {
+                        randomSamples.push_back(Sample2D(Vector2(dis(gen), dis(gen)), 1));
+                        randomDoubles.push_back(dis(gen));
+                    }
+                }
+            }
         }
     }
 
-    for (int n=0; n < samplesPerPixel; n++) {
-        Vector2 pixel = getVectorSample();
-
-        int xindex = (int)(width*(pixel.x+0.5));
-        int yindex = (int)(height*(pixel.y+0.5));
-        fprintf(stdout," %f ", pixel.x);
-        pix[xindex][yindex] = 255;
-    }
-	
-
-	FILE *f = fopen("samplertest.bmp", "w");
-	fprintf(f, "P3\n%d %d\n%d\n ",width,height,255);
-	for (int row=0;row<width;row++) {
-		for (int col=0;col<height;col++) {
-			fprintf(f,"%d %d %d ", (int)pix[col][row], (int)pix[col][row], (int)pix[col][row]);
-		}
-		fprintf(f, "\n");
-	}
-	fclose(f);
-
+    stratifiedSampleNumber = 0;
+    randomSampleNumber = 0;
+    randomDoubleNumber = 0;
 }
 
+Vector3 PixelSampler::quadToHemisphere(double u1, double u2) {
+	const double r = std::sqrt(u1);
+	const double theta = TAU * u2;
+
+	const double x = r * std::cos(theta);
+	const double y = r * std::sin(theta);
+
+    double height = std::sqrt(1-r*r);
+    
+	return Vector3(x, y, height);
+}
+
+
+Sample2D PixelSampler::getStratifiedSample() {
+    return stratifiedSamples[stratifiedSampleNumber++];
+}
+
+Sample3D PixelSampler::getRandomHemisphereSample() {
+    Vector2 sample = randomSamples[randomSampleNumber++].value;
+    Vector3 hemisphereSample = quadToHemisphere(sample.x, sample.y);
+    return Sample3D(hemisphereSample, hemisphereSample.z/TAU);
+}
+
+double PixelSampler::getRandomDouble() {
+    return randomDoubles[randomDoubleNumber++];
+}

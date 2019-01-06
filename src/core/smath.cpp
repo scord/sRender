@@ -2,7 +2,7 @@
 
 
 Transform::Transform(Vector3 p, Vector3 s, Vector3 r) {
-    inverse = setMatrix((Vector3()-p)*Vector3(1/s.x, 1/s.y,1/s.z),Vector3(1/s.x, 1/s.y, 1/s.z),Vector3()-r);
+    inverse = setMatrix((Vector3()-p)*Vector3(1/s.x, 1/s.y, 1/s.z),Vector3(1/s.x, 1/s.y, 1/s.z),Vector3()-r);
     matrix = setMatrix(p, s, r);
 }
 
@@ -17,34 +17,7 @@ Matrix4 Transform::setMatrix(Vector3 p, Vector3 s, Vector3 r) {
     matrixTS.set(1, 3, p.y);
     matrixTS.set(2, 3, p.z);
 
-    Matrix4 matrixRx;
-
-    matrixRx.set(0, 0, 1);
-    matrixRx.set(1, 1, cos(r.x));
-    matrixRx.set(1, 2, -sin(r.x));
-    matrixRx.set(2, 1, sin(r.x));
-    matrixRx.set(2, 2, cos(r.x));
-    matrixRx.set(3, 3, 1);
-
-    Matrix4 matrixRy;
-
-    matrixRy.set(1, 1, 1);
-    matrixRy.set(0, 0, cos(r.y));
-    matrixRy.set(0, 2, -sin(r.y));
-    matrixRy.set(2, 0, sin(r.y));
-    matrixRy.set(2, 2, cos(r.y));
-    matrixRy.set(3, 3, 1);
-
-    Matrix4 matrixRz;
-
-    matrixRz.set(2, 2, 1);
-    matrixRz.set(0, 0, cos(r.z));
-    matrixRz.set(0, 1, -sin(r.z));
-    matrixRz.set(1, 0, sin(r.z));
-    matrixRz.set(1, 1, cos(r.z));
-    matrixRz.set(3, 3, 1);
-
-    return matrixTS * matrixRx * matrixRy * matrixRz;
+    return matrixTS;
 }
 
 

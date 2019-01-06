@@ -22,8 +22,7 @@ bool Scene::intersect(Ray ray, Vector3& intersection, Shape* &intersectedGeometr
     for (auto object : objects) {
  
         Shape* intersectedGeo;
-        Ray transformedRay = object->objectSpaceRay(ray);
-        double t = object->intersect(transformedRay, intersectedGeo);
+        double t = object->intersect(ray, intersectedGeo);
 
         if (t < minT && t > 0) {
             minT = t;
@@ -42,12 +41,14 @@ bool Scene::intersect(Ray ray, Vector3& intersection, Shape* &intersectedGeometr
 }
 
 Object::Object(std::vector<Shape*> geometry, Vector3 pos, float scale) : geometry(geometry), transform(Transform(pos, Vector3(scale, scale, scale), Vector3())), aabb(calculateBoundingBox()) {
-    
+    for (int i = 0; i < geometry.size(); i++) {
+        geometry[i]->transform(pos, Vector3(scale, scale, scale));
+    }
 } 
 
 KDTreeObject::KDTreeObject(std::vector<Shape*> geometry, Vector3 pos, float scale) : 
-    Object(geometry, pos, scale), 
-    root(KDTreeNode(calculateBoundingBox(), geometry, 0)) {
+    Object(geometry, pos, scale) { 
+    root = KDTreeNode(calculateBoundingBox(), this->geometry, 0);
 }
 
 Ray Object::objectSpaceRay(Ray ray) {

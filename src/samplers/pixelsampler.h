@@ -1,18 +1,25 @@
 #pragma once
 
-#include "../core/sampler.h"
 #include <vector>
 #include "../core/smath.h"
+#include "../core/sample.h"
+#include "../core/sampler.h"
+#include <random>
 
-class PixelSampler : public Sampler {
+class PixelSampler {
 public:
-    PixelSampler(int samplesPerPixel);
-    double getdoubleSample();
-    Vector2 getVectorSample();
-    Vector2 getPixelSample(const Vector2 &p);
-    int sampleNumber;
+    PixelSampler() {};
+    PixelSampler(int w, int h, int n, int d);
+    Sample2D getStratifiedSample();
+    Sample3D getRandomHemisphereSample();
+    double getRandomDouble();
+    Vector3 quadToHemisphere(double u1, double u2);
+    int stratifiedSampleNumber;
+    int randomSampleNumber;
+    int randomDoubleNumber;
     void generateTestImage(const int width, const int height);
 protected:
-    std::vector<double> doubleSamples;
-    std::vector<Vector2> vectorSamples;
+    std::vector<Sample2D> stratifiedSamples;
+    std::vector<Sample2D> randomSamples;
+    std::vector<double> randomDoubles;
 };
