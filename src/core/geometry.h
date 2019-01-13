@@ -67,10 +67,14 @@ class Disc : public Plane {
 public:
     Disc(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf, Vector2 size);
     Vector2 size;
+    float area;
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
     virtual double Intersect(Ray ray, Vector3 &intersection);
     virtual void transform(Vector3 position, Vector3 scale);
+    float calculateArea();
+    Sample3D sample(double u1, double u2);
+    Matrix3 rotationMatrix;
 };
 
 class Quad : public Plane {

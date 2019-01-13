@@ -21,6 +21,8 @@ PixelSampler::PixelSampler(int w, int h, int n, int d) {
                         randomSamples.push_back(Sample2D(Vector2(dis(gen), dis(gen)), 1));
                         randomDoubles.push_back(dis(gen));
                     }
+                    randomDoubles.push_back(dis(gen));
+                    randomDoubles.push_back(dis(gen));
                 }
             }
         }

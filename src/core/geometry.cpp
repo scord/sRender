@@ -205,7 +205,10 @@ void Plane::transform(Vector3 position, Vector3 scale) {
 
 
 
-Disc::Disc(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf, Vector2 size) : Plane(p0, n, colour, brdf), size(size) {}
+Disc::Disc(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf, Vector2 size) : Plane(p0, n, colour, brdf), size(size) {
+    area = calculateArea();
+    rotationMatrix = n.rotationMatrix();
+}
 
 double Disc::Intersect(Ray ray, Vector3& intersection) {
     double t = Plane::Intersect(ray, intersection);
@@ -224,6 +227,24 @@ void Disc::transform(Vector3 position, Vector3 scale) {
     p0 += position;
     size.x *= scale.x;
     size.y *= scale.y;
+    area = calculateArea();
+}
+
+float Disc::calculateArea() {
+    return IPI*size.x*size.x;
+}
+
+Sample3D Disc::sample(double u1, double u2) {
+    const double r = size.x*std::sqrt(u1);
+	const double theta = TAU * u2;
+
+	const double x = r * std::cos(theta);
+	const double y = r * std::sin(theta);
+    const double z = 0;
+
+    Vector3 pos = p0 + rotationMatrix*Vector3(x,y,z);
+
+	return Sample3D(pos, 1/area);
 }
 
 

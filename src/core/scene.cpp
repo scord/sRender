@@ -24,7 +24,7 @@ bool Scene::intersect(Ray ray, Vector3& intersection, Shape* &intersectedGeometr
         Shape* intersectedGeo;
         double t = object->intersect(ray, intersectedGeo);
 
-        if (t < minT && t > 0) {
+        if (t < minT && t > 0.0001) {
             minT = t;
     
             intersectedGeometry = (intersectedGeo);

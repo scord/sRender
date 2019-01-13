@@ -6,6 +6,23 @@ const double PI = 3.141592653589793238463;
 const double TAU = 2*PI;
 const double IPI = 1/PI;
 
+struct Vector3;
+
+struct Matrix3 {
+    std::vector<std::vector<double>> mat;
+    Matrix3();
+    Matrix3(int i);
+    void set(int row, int col, double value);
+    double get(int row, int col);
+    Matrix3 operator*(Matrix3 m) const;
+    Vector3 operator*(Vector3 v) const;
+    Matrix3 operator*(double f) const; 
+    Matrix3 operator+(Matrix3 m) const;
+    Vector3 row(int i) const;
+    Vector3 column(int i) const;
+};
+
+
 struct Vector3 {
     double x, y, z;
     Vector3();
@@ -26,6 +43,8 @@ struct Vector3 {
     double length() const;
     Vector3 norm();
     Vector3 clamp();
+    Matrix3 skewSymmetric();
+    Matrix3 rotationMatrix();
 };
 
 struct Vector2 {
@@ -72,6 +91,8 @@ struct Matrix4 {
     Vector4 row(int i) const;
     Vector4 column(int i) const;
 };
+
+
 
 struct Transform {
     Matrix4 matrix;

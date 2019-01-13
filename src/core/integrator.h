@@ -10,5 +10,5 @@ public:
     Integrator(PixelSampler& sampler, int maxDepth);
     PixelSampler sampler;
     int maxDepth;
-    Vector3 getRadiance(Ray ray, int depth, Scene scene);
+    Vector3 getRadiance(Ray ray, int depth, Scene scene, Disc light);
 };

@@ -11,10 +11,29 @@ Integrator::Integrator(PixelSampler& sampler, int maxDepth) {
    this->sampler = sampler;
 }
 
-Vector3 Integrator::getRadiance(Ray ray, int depth, Scene scene) {
+
+Vector3 Integrator::getRadiance(Ray ray, int depth, Scene scene, Disc light) {
 
     if (depth >= maxDepth) {
-        return Vector3();
+        
+        Sample3D lightSample = light.sample(sampler.getRandomDouble(), sampler.getRandomDouble());
+
+        ray.direction = lightSample.value - ray.origin;
+
+        Vector3 closestIntersection;
+        Shape* intersectedObject;
+        Vector3 intersection;
+        bool intersectionFound = scene.intersect(ray, closestIntersection, intersectedObject);
+
+        if (!intersectionFound) {
+            return Vector3(2000,2000,2000);
+        }
+        else if (intersectedObject->isLight) {
+            return intersectedObject->colour;
+        } else {
+            return Vector3(0,0,0);
+        }
+
     }
     
     Vector3 closestIntersection;
@@ -46,9 +65,25 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene scene) {
                         std::fmax(intersectedObject->colour.y,
                                   intersectedObject->colour.z));
     if (e > p ) {
-        return Vector3();
+        Sample3D lightSample = light.sample(sampler.getRandomDouble(), sampler.getRandomDouble());
+
+        ray.direction = lightSample.value - ray.origin;
+
+        Vector3 closestIntersection;
+        Shape* intersectedObject;
+        Vector3 intersection;
+        bool intersectionFound = scene.intersect(ray, closestIntersection, intersectedObject);
+
+        if (!intersectionFound) {
+            return Vector3(2000,2000,2000);
+        }
+        else if (intersectedObject->isLight) {
+            return intersectedObject->colour;
+        } else {
+            return Vector3(0,0,0);
+        }
     }
 
-    return getRadiance(newRay, depth+1, scene) * 0.4*brdf / (sample.pdf/sample.value.z);
+    return getRadiance(newRay, depth+1, scene, light) * 0.4*brdf / (sample.pdf/sample.value.z);
 
 }

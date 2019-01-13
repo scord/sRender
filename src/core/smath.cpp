@@ -32,6 +32,120 @@ Vector3 Transform::applyInverse(Vector3 v) {
     return Vector3(v4.x, v4.y, v4.z);
 }
 
+Matrix3::Matrix3() {
+    mat = std::vector<std::vector<double>> {{0,0,0},
+                                                {0,0,0},
+                                                {0,0,0}};
+}
+
+Matrix3::Matrix3(int i) {
+
+    if (i == 0) {
+
+        mat = std::vector<std::vector<double>> {{0,0,0},
+                                                {0,0,0},
+                                                {0,0,0}};
+    } else {
+        mat = std::vector<std::vector<double>> {{1,0,0},
+                                                {0,1,0},
+                                                {0,0,1}};
+    }
+}
+
+void Matrix3::set(int row, int col, double value) {
+    mat[row][col] = value;
+}
+
+double Matrix3::get(int row, int col) {
+    return mat[row][col];
+}
+
+
+Vector3 Matrix3::operator*(Vector3 v) const {
+    Vector3 result;
+
+    result.x = this->row(0).dot(v);
+    result.y = this->row(1).dot(v);
+    result.z = this->row(2).dot(v);
+
+    return result;
+
+}
+
+
+Matrix3 Matrix3::operator*(double f) const {
+    Matrix3 result(0);
+
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            result.set(i, j, mat[i][j]*f);
+        }
+    }
+
+    return result;
+}
+
+Matrix3 Matrix3::operator*(Matrix3 m) const {
+    Matrix3 result(0);
+
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            result.set(i, j, this->row(i).dot(m.column(j)));
+        }
+    }
+
+    return result;
+}
+
+Matrix3 Matrix3::operator+(Matrix3 m) const {
+    Matrix3 result(0);
+
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            result.set(i, j, mat[i][j] + m.get(i, j));
+        }
+    }
+
+    return result;
+}
+
+Vector3 Matrix3::column(int i) const {
+    return Vector3(mat[0][i], mat[1][i], mat[2][i]);
+}
+
+Vector3 Matrix3::row(int i) const {
+    return Vector3(mat[i][0], mat[i][1], mat[i][2]);
+}
+
+Matrix3 Vector3::rotationMatrix() {
+    Vector3 b(0, 0, 1);
+
+    Matrix3 v = this->cross(b).skewSymmetric();
+
+    double s = this->length();
+
+    double c = this->dot(b);
+
+
+    Matrix3 identity(1);
+
+    Matrix3 rotation = identity + v + v*v*(1-c)*(1/(s*s));
+
+    return rotation;
+
+}
+
+Matrix3 Vector3::skewSymmetric() {
+    Matrix3 mat(0);
+    mat.set(0, 1, -z);
+    mat.set(0, 2, y);
+    mat.set(1, 0, z);
+    mat.set(1, 2, -x);
+    mat.set(2, 0, -y);
+    mat.set(2,1, x);
+    return mat;
+}
+
 Matrix4::Matrix4() {
     mat = std::vector<std::vector<double>> {{0,0,0,0},
                                            {0,0,0,0},

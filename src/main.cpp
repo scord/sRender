@@ -19,11 +19,11 @@
 
 #define PI 3.1415926536
 
-std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth);
+std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth, Disc light);
 
 int main() {
 
-	Camera cam(Vector3(0,0,1.5), 180, 180, PI/4);
+	Camera cam(Vector3(0,0,0.99), 180, 180, PI/4);
 
 	Scene scene;
 
@@ -42,6 +42,7 @@ int main() {
 	roomGeometry.push_back(new Quad(Vector3(0,1,0), Vector3(0,-1,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
 	roomGeometry.push_back(new Quad(Vector3(0,-1,0), Vector3(0,1,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
 	roomGeometry.push_back(new Quad(Vector3(0,0,-1), Vector3(0,0,1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,1,0)));
+	roomGeometry.push_back(new Quad(Vector3(0,0,1), Vector3(0,0,1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,1,0)));
 	roomGeometry.push_back(new Quad(Vector3(1,0,0), Vector3(-1,0,0), Vector3(1,0,0), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
 	roomGeometry.push_back(new Quad(Vector3(-1,0,0), Vector3(1,0,0), Vector3(0,1,0), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
 
@@ -67,7 +68,7 @@ int main() {
 	//scene.push_back(triangleTest);
 	// LIGHT
 
-	Shape* areaLight = new Disc(Vector3(0,0.999,0), Vector3(0,-1,0), Vector3(10000,9800,9500), new DiffuseBrdf(), Vector2(0.5,0.5));
+	Shape* areaLight = new Disc(Vector3(0,0.99,0), Vector3(0,-1,0), Vector3(10000,9800,9500), new DiffuseBrdf(), Vector2(0.5,0.5));
 	areaLight->isLight = true;
 
 	std::vector<Shape*> lightGeometry;
@@ -84,13 +85,13 @@ int main() {
         }
     }
 
-	int samplesPerPixel = 512;
+	int samplesPerPixel = 32;
 	
 	auto start = std::chrono::high_resolution_clock::now();
 	
 	// prepare tiles
 
-	int tileCount = 6;
+	int tileCount = 2;
 	int tileWidth = cam.width/tileCount;
 	std::vector<std::vector<std::vector<Vector3>>> tiles;
 
@@ -122,7 +123,7 @@ int main() {
 			}
 		}
 
-		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 5));
+		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 20, *static_cast<Disc*>(areaLight)));
 	}
 
 	int k = 0;
@@ -165,7 +166,7 @@ int main() {
 }
 
 
-std::vector<std::vector<Vector3>> renderTile(int tileNumber, std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth) {
+std::vector<std::vector<Vector3>> renderTile(int tileNumber, std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth, Disc light) {
 
 	
 
@@ -185,7 +186,7 @@ std::vector<std::vector<Vector3>> renderTile(int tileNumber, std::vector<std::ve
 				
 				Ray ray = cam.pixelToRay(Vector2(tileNumber*tileWidth+i, j) + pixelSampler.getStratifiedSample().value);
 				
-				Vector3 colour = pathTracer.getRadiance(ray, 0, scene);
+				Vector3 colour = pathTracer.getRadiance(ray, 0, scene, light);
 				tile[i][j] += colour/samplesPerPixel;
 
 			}
