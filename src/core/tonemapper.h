@@ -21,7 +21,7 @@ public:
             for (int j = 0; j < radiance[0].size(); j++) {
                 
                 float lum = ToneMapper::luminance(radiance[i][j]);
-                float scaledLuminance = lum*0.4/averageLuminance;
+                float scaledLuminance = lum*0.3/averageLuminance;
 
                 float finalLuminance = scaledLuminance/(1+scaledLuminance);
 

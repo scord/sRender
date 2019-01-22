@@ -1,11 +1,12 @@
 #include "diffuse.h"
 
 Vector3 DiffuseBrdf::getValue(Vector3 albedo) {
-    return albedo / PI;
+    return albedo * 0.4 / PI;
 }
 
-void DiffuseBrdf::giveSample(Sample3D sample) {
-    this->sample = sample;
+Sample3D DiffuseBrdf::getSample(double u1, double u2) {
+    sample = sampler.getSample(u1, u2);
+    return sample;
 }
 
 Ray DiffuseBrdf::getRay(Ray ray, Vector3 p, Vector3 n) {

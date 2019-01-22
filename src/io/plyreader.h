@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include "../core/geometry.h"
-#include "../brdfs/diffuse.h"
+#include "../brdfs/specular.h"
 #include "../core/scene.h"
 #include <memory>
 
@@ -83,7 +83,7 @@ public:
                                              vertices[v1],
                                              vertices[v2],
                                              Vector3(1, 1, 1),
-                                             new DiffuseBrdf());
+                                             new SpecularBrdf());
 
 
 

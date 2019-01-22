@@ -12,78 +12,86 @@ Integrator::Integrator(PixelSampler& sampler, int maxDepth) {
 }
 
 
-Vector3 Integrator::getRadiance(Ray ray, int depth, Scene scene, Disc light) {
+Sample3D Integrator::getDirectIllumination(Vector3 pos, Shape* object, Scene* scene, Disc* light) {
+    Sample3D lightSample = light->sample(sampler.getRandomDouble(), sampler.getRandomDouble());
+
+    Ray ray(pos, (lightSample.value - pos).norm());
+
+    Vector3 closestLightIntersection;
+    Shape* intersectedLight;
+    Vector3 intersection;
+    bool intersectionFound = scene->intersect(ray, closestLightIntersection, intersectedLight);
+
+
+    Vector3 n = object->normal(pos);
+
+    Vector3 lightN = light->normal(pos);
+
+    double lightRayLength = ray.direction.length();
+    double cost2 = std::abs(lightN.dot(Vector3()-ray.direction.norm()));
+    double pdf = lightSample.pdf * lightRayLength*lightRayLength/cost2;
+    if (intersectionFound && intersectedLight->isLight) {
+        
+        double cost = std::abs(ray.direction.dot(n)/(ray.direction.length()*n.length()));
+
+        
+        
+        
+
+        return Sample3D(intersectedLight->colour*object->brdf->getValue(object->colour)*cost, 1/TAU);
+    } else {
+        return Sample3D(Vector3(0,0,0), 0);
+    }
+
+}
+
+double Integrator::balanceHeuristic(double pdf1, double pdf2) {
+    return pdf1/(pdf1+pdf2);
+}
+
+double Integrator::balanceHeuristicDividedByPdf(double pdf, double pdf2) {
+    return pdf/(pdf*pdf+pdf2*pdf2);
+}
+
+Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Disc* light) {
 
     if (depth >= maxDepth) {
-        
-        Sample3D lightSample = light.sample(sampler.getRandomDouble(), sampler.getRandomDouble());
-
-        ray.direction = lightSample.value - ray.origin;
-
-        Vector3 closestIntersection;
-        Shape* intersectedObject;
-        Vector3 intersection;
-        bool intersectionFound = scene.intersect(ray, closestIntersection, intersectedObject);
-
-        if (!intersectionFound) {
-            return Vector3(2000,2000,2000);
-        }
-        else if (intersectedObject->isLight) {
-            return intersectedObject->colour;
-        } else {
-            return Vector3(0,0,0);
-        }
-
+        return Vector3();
     }
+
     
     Vector3 closestIntersection;
     Shape* intersectedObject;
 
 
     Vector3 intersection;
-    bool intersectionFound = scene.intersect(ray, closestIntersection, intersectedObject);
+    bool intersectionFound = scene->intersect(ray, closestIntersection, intersectedObject);
         
     if (!intersectionFound) {
-        return Vector3(2000,2000,2000);
+        return Vector3(0,0,0);
     }
     if (intersectedObject->isLight) {
         return intersectedObject->colour;
-    }
+    } else {
 
-    Sample3D sample = sampler.getRandomHemisphereSample();
-    
+        Sample3D sample = intersectedObject->brdf->getSample(sampler.getRandomDouble(), sampler.getRandomDouble());
 
-    intersectedObject->brdf->giveSample(sample);
+        
 
-    Vector3 brdf = intersectedObject->brdf->getValue(intersectedObject->colour);
+        Ray newRay = intersectedObject->brdf->getRay(ray, closestIntersection, intersectedObject->normal(closestIntersection));
+        Vector3 brdf = intersectedObject->brdf->getValue(intersectedObject->colour);
+        
+        Vector3 radiance = getRadiance(newRay, depth+1, scene, light) * brdf*sample.value.z;
 
-    Ray newRay = intersectedObject->brdf->getRay(ray, closestIntersection, intersectedObject->normal(closestIntersection));
-
-    // RUSSIAN ROULETTE PATH TERMINATION
-    double e = sampler.getRandomDouble();
-    double p = 0.9*std::fmax(intersectedObject->colour.x,
-                        std::fmax(intersectedObject->colour.y,
-                                  intersectedObject->colour.z));
-    if (e > p ) {
-        Sample3D lightSample = light.sample(sampler.getRandomDouble(), sampler.getRandomDouble());
-
-        ray.direction = lightSample.value - ray.origin;
-
-        Vector3 closestIntersection;
-        Shape* intersectedObject;
-        Vector3 intersection;
-        bool intersectionFound = scene.intersect(ray, closestIntersection, intersectedObject);
-
-        if (!intersectionFound) {
-            return Vector3(2000,2000,2000);
+        if (sample.pdf == 1) {
+            return radiance;
         }
-        else if (intersectedObject->isLight) {
-            return intersectedObject->colour;
-        } else {
-            return Vector3(0,0,0);
-        }
-    }
 
-    return getRadiance(newRay, depth+1, scene, light) * 0.4*brdf / (sample.pdf/sample.value.z);
+        Sample3D directIlluminationSample = getDirectIllumination(closestIntersection, intersectedObject, scene, light);
+        Vector3 directIllumination = directIlluminationSample.value*brdf;
+
+        return radiance*balanceHeuristicDividedByPdf(sample.pdf, directIlluminationSample.pdf) + directIllumination*balanceHeuristicDividedByPdf(directIlluminationSample.pdf, sample.pdf);
+
+    }
 
 }

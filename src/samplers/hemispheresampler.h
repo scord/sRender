@@ -6,8 +6,6 @@
 
 class HemisphereSampler {
 public:
-    HemisphereSampler(int nSamples);
     HemisphereSampler();
-    Sampler sampler;
-    Sample3D getSample();
+    Sample3D getSample(double u1, double u2);
 };

@@ -2,12 +2,9 @@
 #include "hemispheresampler.h"
 #include <random>
 
-HemisphereSampler::HemisphereSampler(int nSamples) {
-	sampler = Sampler(nSamples);
-}
 
 HemisphereSampler::HemisphereSampler() {
-	sampler = Sampler(1);
+
 }
 
 Vector3 quadToHemisphere(double u1, double u2) {
@@ -23,10 +20,9 @@ Vector3 quadToHemisphere(double u1, double u2) {
 }
 
 
-Sample3D HemisphereSampler::getSample() {
-    Sample2D sample = sampler.getSample();
-	Vector3 position = quadToHemisphere(sample.value.x, sample.value.y);
-    return Sample3D(position, position.z/TAU);
+Sample3D HemisphereSampler::getSample(double u1, double u2) {
+	Vector3 position = quadToHemisphere(u1, u2);
+    return Sample3D(position, position.z*IPI);
 }
 
 
