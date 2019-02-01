@@ -23,17 +23,17 @@ std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::v
 
 int main() {
 
-	Camera cam(Vector3(0,0,3.5), 280, 280, PI/7);
+	Camera cam(Vector3(0,0,3), 400, 400, PI/6);
 
 	Scene scene;
 
-	PLYReader reader("/home/sam/dev/sRender/src/dragon.ply");
+	//PLYReader reader("/Users/samcordingley/dev/sRender/src/dragon.ply");
 
 	//scene.add(reader.toObject(Vector3(-0.25,-1,-0.5), 4));
 
-	KDTreeObject* bunny = reader.toKDTreeObject(Vector3(0,-1.45,0), 8);
+	//KDTreeObject* bunny = reader.toKDTreeObject(Vector3(0,-1.45,0), 8);
 
-	scene.add(bunny);
+	//scene.add(bunny);
 
 	// ROOM
 	std::vector<Shape*> roomGeometry;
@@ -42,7 +42,7 @@ int main() {
 	roomGeometry.push_back(new Quad(Vector3(0,1,0), Vector3(0,-1,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
 	roomGeometry.push_back(new Quad(Vector3(0,-1,0), Vector3(0,1,0), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,0,-1)));
 	roomGeometry.push_back(new Quad(Vector3(0,0,-1), Vector3(0,0,1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,1,0)));
-	//roomGeometry.push_back(new Quad(Vector3(0,0,3), Vector3(0,0,1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,1,0)));
+	roomGeometry.push_back(new Quad(Vector3(0,0,1), Vector3(0,0,-1), Vector3(1,1,1), new DiffuseBrdf(), Vector2(1.0,1.0), Vector3(0,1,0)));
 	roomGeometry.push_back(new Quad(Vector3(1,0,0), Vector3(-1,0,0), Vector3(1,0,0), new DiffuseBrdf(), Vector2(1.0,1), Vector3(0,0,-1)));
 	roomGeometry.push_back(new Quad(Vector3(-1,0,0), Vector3(1,0,0), Vector3(0,1,0), new DiffuseBrdf(), Vector2(1.0,1), Vector3(0,0,-1)));
 
@@ -62,9 +62,9 @@ int main() {
 
 	std::vector<Shape*> sphereGeometry;
 
-	//sphereGeometry.push_back(new Sphere(Vector3(0, -0.5, 0), Vector3(1,1,1), new SpecularBrdf(), 0.5));
-	//sphereGeometry.push_back(new Sphere(Vector3(0, 0.7, 0), Vector3(1,1,1), new DiffuseBrdf(), 0.7));
-	//scene.add(new Object(sphereGeometry, Vector3(0,0,0), 1));
+	sphereGeometry.push_back(new Sphere(Vector3(0.4, -0.6, 0.3), Vector3(1,1,1), new SpecularBrdf(), 0.4));
+	sphereGeometry.push_back(new Sphere(Vector3(-0.3, -0.6, -0.25), Vector3(0.5,0.5,0.5), new MirrorBrdf(), 0.4));
+	scene.add(new Object(sphereGeometry, Vector3(0,0,0), 1));
 
 	
 	Triangle* triangleTest = new Triangle(Vector3(-1,-1,-1), Vector3(-1,1,-1), Vector3(1,1,-1), Vector3(10000,10000,10000), new DiffuseBrdf());
@@ -72,7 +72,7 @@ int main() {
 	//scene.push_back(triangleTest);
 	// LIGHT
 
-	Shape* areaLight = new Disc(Vector3(0,0.99,0), Vector3(0,-1,0), Vector3(1000,980,950), new DiffuseBrdf(), Vector2(0.5,0.5));
+	Shape* areaLight = new Disc(Vector3(0,0.999,0), Vector3(0,-1,0), Vector3(1000,880,650), new DiffuseBrdf(), Vector2(0.5,0.5));
 	areaLight->isLight = true;
 
 	std::vector<Shape*> lightGeometry;
@@ -89,13 +89,13 @@ int main() {
         }
     }
 
-	int samplesPerPixel = 256;
+	int samplesPerPixel = 16;
 	
 	auto start = std::chrono::high_resolution_clock::now();
 	
 	// prepare tiles
 
-	int tileCount = 7;
+	int tileCount = 2;
 	int tileWidth = cam.width/tileCount;
 	std::vector<std::vector<std::vector<Vector3>>> tiles;
 
@@ -127,7 +127,7 @@ int main() {
 			}
 		}
 
-		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 4, *static_cast<Disc*>(areaLight)));
+		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 5, *static_cast<Disc*>(areaLight)));
 	}
 
 	int k = 0;

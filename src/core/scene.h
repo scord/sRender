@@ -11,7 +11,7 @@ public:
     Ray objectSpaceRay(Ray ray);
     std::vector<Shape*> geometry;
     Object() {};
-    Object(std::vector<Shape*> geometry, Vector3 pos, float scale);
+    Object(std::vector<Shape*> geometry, Vector3 pos, double scale);
     BoundingBox aabb;
     BoundingBox calculateBoundingBox();
     virtual double intersect(Ray ray, Shape* &intersectedGeometry);
@@ -20,7 +20,7 @@ public:
 class KDTreeObject : public Object {
 public:
     KDTreeObject() {};
-    KDTreeObject(std::vector<Shape*> geometry, Vector3 pos, float scale);
+    KDTreeObject(std::vector<Shape*> geometry, Vector3 pos, double scale);
     virtual double intersect(Ray ray, Shape* &intersectedGeometry);
     KDTreeNode root;
 };

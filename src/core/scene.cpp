@@ -15,7 +15,7 @@ void Scene::add(Object* object) {
 
 bool Scene::intersect(Ray ray, Vector3& intersection, Shape* &intersectedGeometry) {
 
-    float minT = 99999;
+    double minT = 99999;
     bool intersectionFound = false;
     
  
@@ -24,7 +24,7 @@ bool Scene::intersect(Ray ray, Vector3& intersection, Shape* &intersectedGeometr
         Shape* intersectedGeo;
         double t = object->intersect(ray, intersectedGeo);
 
-        if (t < minT && t > 0.0001) {
+        if (t < minT && t > 0.000001) {
             minT = t;
     
             intersectedGeometry = (intersectedGeo);
@@ -40,13 +40,13 @@ bool Scene::intersect(Ray ray, Vector3& intersection, Shape* &intersectedGeometr
     return intersectionFound;
 }
 
-Object::Object(std::vector<Shape*> geometry, Vector3 pos, float scale) : geometry(geometry), transform(Transform(pos, Vector3(scale, scale, scale), Vector3())), aabb(calculateBoundingBox()) {
+Object::Object(std::vector<Shape*> geometry, Vector3 pos, double scale) : geometry(geometry), transform(Transform(pos, Vector3(scale, scale, scale), Vector3())), aabb(calculateBoundingBox()) {
     for (int i = 0; i < geometry.size(); i++) {
         geometry[i]->transform(pos, Vector3(scale, scale, scale));
     }
 } 
 
-KDTreeObject::KDTreeObject(std::vector<Shape*> geometry, Vector3 pos, float scale) : 
+KDTreeObject::KDTreeObject(std::vector<Shape*> geometry, Vector3 pos, double scale) : 
     Object(geometry, pos, scale) { 
     root = KDTreeNode(calculateBoundingBox(), this->geometry, 0);
 }

@@ -13,6 +13,8 @@ public:
     Sample2D getStratifiedSample();
     Sample3D getRandomHemisphereSample();
     double getRandomDouble();
+    std::mt19937 gen;
+
     Vector3 quadToHemisphere(double u1, double u2);
     int stratifiedSampleNumber;
     int randomSampleNumber;
@@ -22,4 +24,5 @@ protected:
     std::vector<Sample2D> stratifiedSamples;
     std::vector<Sample2D> randomSamples;
     std::vector<double> randomDoubles;
+    std::uniform_real_distribution<double> dis;
 };

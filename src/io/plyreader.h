@@ -32,10 +32,10 @@ public:
         }
         return n;
     }
-    Object* toObject(Vector3 pos, float scale) {
+    Object* toObject(Vector3 pos, double scale) {
         return new Object(toTriangles(), pos, scale);
     }
-    KDTreeObject* toKDTreeObject(Vector3 pos, float scale) {
+    KDTreeObject* toKDTreeObject(Vector3 pos, double scale) {
         std::vector<Shape*> test = toTriangles();
 
         return new KDTreeObject(test, pos, scale);
@@ -64,7 +64,7 @@ public:
             std::getline(file, line);
             std::istringstream iss(line);
 
-            float x, y, z;
+            double x, y, z;
             iss >> x >> y >> z;
 
             vertices.push_back(Vector3(x,y,z));

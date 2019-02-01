@@ -9,21 +9,22 @@ PixelSampler::PixelSampler(int w, int h, int n, int d) {
     double grid_size = sqrt(n);
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<double> dis(0,1);
-
+    dis = std::uniform_real_distribution<double>(0,1);
+    this->gen = gen;
     for (int x = 0; x < w; x++) {
         for (int y = 0; y < h; y++) {
-            // stratified sampling
             for (int i = 0; i < grid_size; i++) {
                 for (int j = 0; j < grid_size; j++) {
                     stratifiedSamples.push_back(Sample2D(Vector2(i/grid_size + dis(gen)/grid_size, j/grid_size + dis(gen)/grid_size), 1));
-                    
+
+
                     for (int k = 0; k < d; k++) {
-                        randomSamples.push_back(Sample2D(Vector2(dis(gen), dis(gen)), 1));
-                        randomDoubles.push_back(dis(gen));
-                        randomDoubles.push_back(dis(gen));
-                        randomDoubles.push_back(dis(gen));
-                        randomDoubles.push_back(dis(gen));
+                        //randomSamples.push_back(Sample2D(Vector2(dis(gen), dis(gen)), 1));
+                        randomDoubles.push_back((float)dis(gen));
+                       // randomDoubles.push_back((float)dis(gen));
+                       // randomDoubles.push_back((float)dis(gen));
+                       // randomDoubles.push_back((float)dis(gen));
+
                         //randomDoubles.push_back(dis(gen));
                     }
                     
@@ -65,7 +66,12 @@ Sample3D PixelSampler::getRandomHemisphereSample() {
 }
 
 double PixelSampler::getRandomDouble() {
-    double value = randomDoubles[randomDoubleNumber--];
+    if (randomDoubleNumber == 0) {
+        return (float)dis(gen);
+    }
+    
+    float value = randomDoubles[randomDoubleNumber--];
     randomDoubles.pop_back();
+    
     return value;
 }

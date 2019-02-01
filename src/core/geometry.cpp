@@ -156,13 +156,13 @@ bool BoundingBox::intersects(Ray ray) {
 }
 
 BoundingBox Triangle::calculateBoundingBox() {
-    float minX = std::min(p0.x, std::min(v1.x, v2.x));
-    float minY = std::min(p0.y, std::min(v1.y, v2.y));
-    float minZ = std::min(p0.z, std::min(v1.z, v2.z));
+    double minX = std::min(p0.x, std::min(v1.x, v2.x));
+    double minY = std::min(p0.y, std::min(v1.y, v2.y));
+    double minZ = std::min(p0.z, std::min(v1.z, v2.z));
 
-    float maxX = std::max(p0.x, std::max(v1.x, v2.x));
-    float maxY = std::max(p0.y, std::max(v1.y, v2.y));
-    float maxZ = std::max(p0.z, std::max(v1.z, v2.z));
+    double maxX = std::max(p0.x, std::max(v1.x, v2.x));
+    double maxY = std::max(p0.y, std::max(v1.y, v2.y));
+    double maxZ = std::max(p0.z, std::max(v1.z, v2.z));
 
     return BoundingBox(Vector3(minX,minY,minZ),
                        Vector3(maxX,maxY,maxZ));
@@ -190,6 +190,9 @@ Vector3 Plane::normal(Vector3 p) {
 
 double Plane::Intersect(Ray ray, Vector3& intersection) {
     double np = ray.direction.dot(n);
+    if (np > 0){
+        return 0;
+    }
     double t = (p0.dot(n)-ray.origin.dot(n))/np;
     intersection = ray.origin + ray.direction*t;
     return t;
@@ -230,8 +233,8 @@ void Disc::transform(Vector3 position, Vector3 scale) {
     area = calculateArea();
 }
 
-float Disc::calculateArea() {
-    return IPI*size.x*size.x;
+double Disc::calculateArea() {
+    return PI*size.x*size.x;
 }
 
 Sample3D Disc::sample(double u1, double u2) {
@@ -288,7 +291,7 @@ double Sphere::Intersect(Ray ray, Vector3& intersection) {
     double s1 = -b + d;
     double s2 = -b - d;
     
-    double t = (s2>0) ? s2/2 : ((s1>0) ? s1/2 : 0);
+    double t = (s2>0.0000001) ? s2/2 : ((s1>0.0000001) ? s1/2 : 0);
     intersection = ray.origin + ray.direction*t;
     return t;
 

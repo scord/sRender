@@ -6,7 +6,7 @@ private:
 
 public:
     static std::vector<std::vector<Vector3>> reinhard(std::vector<std::vector<Vector3>> radiance) {
-        float totalLogLuminance = 0;
+        double totalLogLuminance = 0;
 	    int nPixels = radiance.size()*radiance[0].size();
 	    for (std::vector<Vector3> column: radiance) {
             for (Vector3 pixel : column) {
@@ -15,20 +15,29 @@ public:
                 totalLogLuminance += logLuminance;
             }
         }
-        float averageLuminance = exp(totalLogLuminance/nPixels);
+        double averageLuminance = exp(totalLogLuminance/nPixels);
 
         for (int i = 0; i < radiance.size(); i++) {
             for (int j = 0; j < radiance[0].size(); j++) {
                 
-                float lum = ToneMapper::luminance(radiance[i][j]);
-                float scaledLuminance = lum*0.3/averageLuminance;
+                double lum = ToneMapper::luminance(radiance[i][j]);
+                double scaledLuminance = lum*0.2/averageLuminance;
 
-                float finalLuminance = scaledLuminance/(1+scaledLuminance);
+                double finalLuminance = scaledLuminance/(1+scaledLuminance);
 
                 if (lum == 0) {
                     radiance[i][j] = Vector3();
                 } else {
                     radiance[i][j] = radiance[i][j]*finalLuminance/lum;
+                    if (radiance[i][j].x > 1) {
+                        radiance[i][j].x = 1.0;
+                    }
+                    if (radiance[i][j].y > 1) {
+                        radiance[i][j].y = 1.0;
+                    } 
+                    if (radiance[i][j].z > 1) {
+                        radiance[i][j].z = 1.0;
+                    } 
                 }
                 
             }

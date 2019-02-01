@@ -67,12 +67,12 @@ class Disc : public Plane {
 public:
     Disc(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf, Vector2 size);
     Vector2 size;
-    float area;
+    double area;
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
     virtual double Intersect(Ray ray, Vector3 &intersection);
     virtual void transform(Vector3 position, Vector3 scale);
-    float calculateArea();
+    double calculateArea();
     Sample3D sample(double u1, double u2);
     Matrix3 rotationMatrix;
 };

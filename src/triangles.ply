@@ -2,9 +2,9 @@ ply
 format ascii 1.0
 comment zipper output
 element vertex 5
-property float x
-property float y
-property float z
+property double x
+property double y
+property double z
 element face 2
 property list uchar int vertex_indices
 end_header

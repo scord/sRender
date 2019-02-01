@@ -15,3 +15,8 @@ Sample3D MirrorBrdf::getSample(double u1, double u2) {
 Vector3 MirrorBrdf::getValue(Vector3 albedo) {
     return Vector3(1,1,1);
 }
+
+double MirrorBrdf::getPdf(Ray ray, Vector3 p, Vector3 n) {
+    return 0;
+}
+
