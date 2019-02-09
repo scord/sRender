@@ -13,41 +13,51 @@ void Scene::add(Object* object) {
     }
 }
 
-bool Scene::intersect(Ray ray, Vector3& intersection, Shape* &intersectedGeometry) {
+Interaction* Scene::intersect(Ray ray) {
 
     double minT = 99999;
     bool intersectionFound = false;
     
+    Object* intersectedObject;
+    Shape* intersectedGeo;
  
     for (auto object : objects) {
  
-        Shape* intersectedGeo;
-        double t = object->intersect(ray, intersectedGeo);
+        Shape* geo;
+        double t = object->intersect(ray, geo);
 
         if (t < minT && t > 0.000001) {
             minT = t;
     
-            intersectedGeometry = (intersectedGeo);
+            intersectedGeo = geo;
             intersectionFound = true;
+            intersectedObject = object;
         }
 
 
     }
 
- 
-    intersection = ray.origin+ray.direction*minT;
+    if (intersectionFound) {
+        Vector3 intersection = ray.origin+ray.direction*minT;
 
-    return intersectionFound;
+        return new Interaction(Vector3()-ray.direction,
+                            intersection,
+                            intersectedGeo->normal(intersection),
+                            intersectedObject->material,
+                            true);
+    } else {
+        return nullptr;
+    }
 }
 
-Object::Object(std::vector<Shape*> geometry, Vector3 pos, double scale) : geometry(geometry), transform(Transform(pos, Vector3(scale, scale, scale), Vector3())), aabb(calculateBoundingBox()) {
+Object::Object(std::vector<Shape*> geometry, Vector3 pos, double scale, Material* material) : geometry(geometry), transform(Transform(pos, Vector3(scale, scale, scale), Vector3())), aabb(calculateBoundingBox()), material(material) {
     for (int i = 0; i < geometry.size(); i++) {
         geometry[i]->transform(pos, Vector3(scale, scale, scale));
     }
 } 
 
-KDTreeObject::KDTreeObject(std::vector<Shape*> geometry, Vector3 pos, double scale) : 
-    Object(geometry, pos, scale) { 
+KDTreeObject::KDTreeObject(std::vector<Shape*> geometry, Vector3 pos, double scale, Material* material) : 
+    Object(geometry, pos, scale, material) { 
     root = KDTreeNode(calculateBoundingBox(), this->geometry, 0);
 }
 

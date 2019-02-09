@@ -4,14 +4,17 @@
 #include "geometry.h"
 #include "kdtree.h"
 #include <memory>
+#include "material.h"
+#include "interaction.h"
 
 class Object {
 public:
     Transform transform;
     Ray objectSpaceRay(Ray ray);
     std::vector<Shape*> geometry;
+    Material* material;
     Object() {};
-    Object(std::vector<Shape*> geometry, Vector3 pos, double scale);
+    Object(std::vector<Shape*> geometry, Vector3 pos, double scale, Material* material);
     BoundingBox aabb;
     BoundingBox calculateBoundingBox();
     virtual double intersect(Ray ray, Shape* &intersectedGeometry);
@@ -20,7 +23,8 @@ public:
 class KDTreeObject : public Object {
 public:
     KDTreeObject() {};
-    KDTreeObject(std::vector<Shape*> geometry, Vector3 pos, double scale);
+    Material* material;
+    KDTreeObject(std::vector<Shape*> geometry, Vector3 pos, double scale, Material* material);
     virtual double intersect(Ray ray, Shape* &intersectedGeometry);
     KDTreeNode root;
 };
@@ -32,7 +36,9 @@ public:
 
     Scene();
     void add(Object* object);
-    bool intersect(Ray ray, Vector3 &intersection, Shape*  &intersectedGeometry);
+
+    Interaction* intersect(Ray ray);
+
     Ray sampleLight();
 };
 

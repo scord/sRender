@@ -3,15 +3,16 @@
 #include <vector>
 #include "../core/smath.h"
 #include "../core/sample.h"
-#include "../core/sampler.h"
+
 #include <random>
 
-class PixelSampler {
+class Sampler {
 public:
-    PixelSampler() {};
-    PixelSampler(int w, int h, int n, int d);
+    Sampler() {};
+    Sampler(int n, int spp, int d);
     Sample2D getStratifiedSample();
-    Sample3D getRandomHemisphereSample();
+    Sample2D getSample2D();
+
     double getRandomDouble();
     std::mt19937 gen;
 

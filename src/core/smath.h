@@ -29,7 +29,7 @@ struct Vector3 {
     Vector3(double x, double y, double z);
     double dot(const Vector3 &v);
     Vector3 cross(const Vector3 &v);
-  
+    Vector3 rotate(Vector3 &v) const; 
     Vector3 operator+(const Vector3 &v) const;
     Vector3 operator+=(const Vector3 &v);
     Vector3 operator-(const Vector3 &v) const;

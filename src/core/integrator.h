@@ -1,17 +1,20 @@
+#pragma once
+
 #include <vector>
 #include "geometry.h"
 #include "smath.h"
 #include "scene.h"
-#include "../samplers/pixelsampler.h"
+#include "../samplers/sampler.h"
 
 class Integrator {
 public:
     Integrator();
-    Integrator(PixelSampler& sampler, int maxDepth);
-    PixelSampler sampler;
+    Integrator(int maxDepth);
     int maxDepth;
-    Vector3 getRadiance(Ray ray, int depth, Scene* scene, Disc* light);
-    Vector3 getDirectIllumination(Vector3 pos, Shape* object, Scene* scene, Disc* light);
+    Vector3 getRadiance(Ray ray, int depth, Scene* scene, Disc* light, Sampler* sampler);
+    Vector3 getDirectIlluminationMIS(Interaction* interaction, Interaction* nextInteractionP, Scene* scene, Disc* light, Sampler* sampler);
+    Vector3 getDirectIllumination(Interaction* interaction, Scene* scene, Disc* light, Sampler* sampler);
+    Vector3 getIllumination(Interaction* interaction, Interaction* nextInteractionP, Scene* scene, Sampler* sampler);
     double balanceHeuristic(double pdf1, double pdf2);
-    double balanceHeuristicDividedByPdf(double pdf, double pdf2);
+    double powerHeuristicDividedByPdf(double pdf, double pdf2);
 };

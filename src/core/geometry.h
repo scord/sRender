@@ -2,7 +2,8 @@
 
 #include "../core/smath.h"
 #include <vector>
-#include "brdf.h"
+#include "sample.h"
+
 
 class BoundingBox {
 public:
@@ -18,13 +19,13 @@ public:
 
 class Shape {
 public:
-    Shape(Vector3 p0, Vector3 colour, Brdf* brdf);
+    Shape(Vector3 p0);
     Transform objectToWorld;
     Vector3 p0;
-    Vector3 colour;
+    
     Vector3 up;
     Vector3 left;
-    Brdf* brdf;
+    
     bool isLight;
     BoundingBox aabb;
     virtual BoundingBox calculateBoundingBox() = 0;
@@ -38,10 +39,10 @@ public:
 
 class Triangle : public Shape {
 public:
-    Triangle(Vector3 v0, Vector3 v1, Vector3 v2, Vector3 colour, Brdf* brdf);
+    Triangle(Vector3 v0, Vector3 v1, Vector3 v2);
     Vector3 n;
     Vector3 v1, v2;
-    Vector3 colour;
+    
     virtual Vector3 normal(Vector3 p);
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
@@ -54,7 +55,7 @@ public:
 class Plane : public Shape {
 public:
     Vector3 n;
-    Plane(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf);
+    Plane(Vector3 p0, Vector3 n);
     virtual Vector3 normal(Vector3 p) ;
     
     virtual BoundingBox calculateBoundingBox();
@@ -65,7 +66,7 @@ public:
 
 class Disc : public Plane {
 public:
-    Disc(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf, Vector2 size);
+    Disc(Vector3 p0, Vector3 n, Vector2 size);
     Vector2 size;
     double area;
     virtual BoundingBox calculateBoundingBox();
@@ -79,7 +80,7 @@ public:
 
 class Quad : public Plane {
 public:
-    Quad(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf, Vector2 size, Vector3 up);
+    Quad(Vector3 p0, Vector3 n, Vector2 size, Vector3 up);
     Vector2 size;
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
@@ -89,7 +90,7 @@ public:
 
 class Sphere : public Shape {
 public:
-    Sphere(Vector3 p0, Vector3 colour, Brdf* brdf, double radius);
+    Sphere(Vector3 p0, double radius);
     double radius;
     virtual Vector3 normal(Vector3 p);
     virtual BoundingBox calculateBoundingBox();
@@ -97,3 +98,16 @@ public:
     virtual double Intersect(Ray ray, Vector3 &intersection);
     virtual void transform(Vector3 position, Vector3 scale);
 };
+
+class Hemisphere : public Shape {
+public:
+    Hemisphere(Vector3 p0, double radius);
+    double radius;
+    virtual Sample3D map(Sample2D sample);
+    virtual Vector3 normal(Vector3 p);
+    virtual BoundingBox calculateBoundingBox();
+    virtual Vector3 samplePoint();
+    virtual double Intersect(Ray ray, Vector3 &intersection);
+    virtual void transform(Vector3 position, Vector3 scale);
+};
+

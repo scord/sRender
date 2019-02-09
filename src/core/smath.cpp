@@ -120,7 +120,9 @@ Vector3 Matrix3::row(int i) const {
 Matrix3 Vector3::rotationMatrix() {
     Vector3 b(0, 0, 1);
 
-    Matrix3 v = this->cross(b).skewSymmetric();
+    Vector3 test = this->cross(b);
+
+    Matrix3 v = this->cross(b).norm().skewSymmetric();
 
     double s = this->length();
 
@@ -133,6 +135,38 @@ Matrix3 Vector3::rotationMatrix() {
 
     return rotation;
 
+}
+
+Vector3 Vector3::rotate(Vector3 &v) const {
+    Vector3 up;
+    double vx2 = v.x*v.x;
+    double vy2 = v.y*v.y;
+    double vz2 = v.z*v.z;
+ 
+
+    if (vx2 > vy2) {
+		double invLen = 1.f / std::sqrtf(vx2+ vz2);
+		up = Vector3(-v.z * invLen, 0.0f, v.x * invLen);
+    } else {
+		double invLen = 1.0f / std::sqrtf(vy2 + vz2);
+		up = Vector3(0.0f, v.z * invLen, -v.y * invLen);
+    }
+    Vector3 left = v.cross(up);
+
+    Vector3 rotatedDir;
+	rotatedDir.x = Vector3(up.x, 
+                           left.x, 
+                           v.x).dot(*this);
+
+	rotatedDir.y = Vector3(up.y, 
+                           left.y, 
+                           v.y).dot(*this);
+
+	rotatedDir.z = Vector3(up.z, 
+                           left.z, 
+                           v.z).dot(*this);
+	
+    return rotatedDir;
 }
 
 Matrix3 Vector3::skewSymmetric() {

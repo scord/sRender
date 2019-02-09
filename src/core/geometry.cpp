@@ -3,9 +3,8 @@
 #include <cmath>
 
 
-Triangle::Triangle(Vector3 v0, Vector3 v1, Vector3 v2, Vector3 colour, Brdf* brdf) : Shape(v0, colour, brdf), v1(v1), v2(v2) {
+Triangle::Triangle(Vector3 v0, Vector3 v1, Vector3 v2) : Shape(v0), v1(v1), v2(v2) {
     n = (v1 - v0).cross(v2 - v0).norm();
-    this->brdf = brdf;
     aabb = calculateBoundingBox();
 }
 
@@ -19,6 +18,9 @@ Vector3 Quad::samplePoint() {
     
 }
 Vector3 Sphere::samplePoint() {
+    
+}
+Vector3 Hemisphere::samplePoint() {
     
 }
 Vector3 Plane::samplePoint() {
@@ -168,12 +170,11 @@ BoundingBox Triangle::calculateBoundingBox() {
                        Vector3(maxX,maxY,maxZ));
 }
 
-Shape::Shape(Vector3 p0, Vector3 colour, Brdf* brdf) : p0(p0), colour(colour), isLight(false), objectToWorld(Transform(Vector3(0,0,0), Vector3(1,1,1), Vector3())), aabb(BoundingBox(Vector3(),Vector3())) {
-    this->brdf = brdf;
+Shape::Shape(Vector3 p0) : p0(p0), isLight(false), objectToWorld(Transform(Vector3(0,0,0), Vector3(1,1,1), Vector3())), aabb(BoundingBox(Vector3(),Vector3())) {
 
 }
 
-Plane::Plane(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf) : Shape(p0, colour, brdf), n(n) {
+Plane::Plane(Vector3 p0, Vector3 n) : Shape(p0), n(n) {
     if (std::abs(n.x) > std::abs(n.y)) {
 		double invLen = 1.f / sqrtf(n.x * n.x + n.z * n.z);
 		up = Vector3(-n.z * invLen, 0.0f, n.x * invLen);
@@ -208,7 +209,7 @@ void Plane::transform(Vector3 position, Vector3 scale) {
 
 
 
-Disc::Disc(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf, Vector2 size) : Plane(p0, n, colour, brdf), size(size) {
+Disc::Disc(Vector3 p0, Vector3 n, Vector2 size) : Plane(p0, n), size(size) {
     area = calculateArea();
     rotationMatrix = n.rotationMatrix();
 }
@@ -245,13 +246,13 @@ Sample3D Disc::sample(double u1, double u2) {
 	const double y = r * std::sin(theta);
     const double z = 0;
 
-    Vector3 pos = p0 + rotationMatrix*Vector3(x,y,z);
+    Vector3 pos = p0 + Vector3(x,y,z).rotate(n);
 
 	return Sample3D(pos, 1/area);
 }
 
 
-Quad::Quad(Vector3 p0, Vector3 n, Vector3 colour, Brdf* brdf, Vector2 size, Vector3 up) : Plane(p0, n, colour, brdf), size(size) {
+Quad::Quad(Vector3 p0, Vector3 n, Vector2 size, Vector3 up) : Plane(p0, n), size(size) {
     this->up = up;
     left = up.cross(n);
 }
@@ -277,7 +278,8 @@ void Quad::transform(Vector3 position, Vector3 scale) {
     size.y *= scale.y;
 }
 
-Sphere::Sphere(Vector3 p0, Vector3 colour, Brdf* brdf, double r) : Shape(p0, colour, brdf), radius(r) {}
+
+Sphere::Sphere(Vector3 p0, double r) : Shape(p0), radius(r) {}
 
 double Sphere::Intersect(Ray ray, Vector3& intersection) {
     Vector3 dir2 = ray.origin-p0;
@@ -310,5 +312,49 @@ Vector3 Sphere::normal(Vector3 p) {
     return (p - p0).norm();
 }
 
+Hemisphere::Hemisphere(Vector3 p0, double r) : Shape(p0), radius(r) {}
+
+Sample3D Hemisphere::map(Sample2D sample) {
+    const double r = radius*std::sqrt(sample.value.x);
+	const double theta = TAU * sample.value.y;
+
+	const double x = r * std::cos(theta);
+	const double y = r * std::sin(theta);
+
+    double height = std::sqrt(1-r*r);
+    
+	return Sample3D(Vector3(x, y, height), sample.pdf*height*IPI);
+}
+
+double Hemisphere::Intersect(Ray ray, Vector3& intersection) {
+    Vector3 dir2 = ray.origin-p0;
+    double b = (dir2*2).dot(ray.direction);
+    double c = dir2.dot(dir2) - (radius*radius);
+    double d = b*b - 4*c;
+    if (d<0) {
+        return -1;
+    }
+    d = std::sqrt(d);
+    double s1 = -b + d;
+    double s2 = -b - d;
+    
+    double t = (s2>0.0000001) ? s2/2 : ((s1>0.0000001) ? s1/2 : 0);
+    intersection = ray.origin + ray.direction*t;
+    return t;
+
+}
+
+void Hemisphere::transform(Vector3 position, Vector3 scale) {
+    p0 += position;
+    radius *= scale.x;
+}
+
+BoundingBox Hemisphere::calculateBoundingBox() {
+    return BoundingBox(Vector3(), Vector3());
+}
+
+Vector3 Hemisphere::normal(Vector3 p) {
+    return (p - p0).norm();
+}
 
 
