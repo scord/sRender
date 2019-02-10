@@ -120,14 +120,10 @@ Vector3 Matrix3::row(int i) const {
 Matrix3 Vector3::rotationMatrix() {
     Vector3 b(0, 0, 1);
 
-    Vector3 test = this->cross(b);
-
     Matrix3 v = this->cross(b).norm().skewSymmetric();
 
-    double s = this->length();
-
     double c = this->dot(b);
-
+    double s = std::sqrt(1-c*c);
 
     Matrix3 identity(1);
 
@@ -145,10 +141,10 @@ Vector3 Vector3::rotate(Vector3 &v) const {
  
 
     if (vx2 > vy2) {
-		double invLen = 1.f / std::sqrtf(vx2+ vz2);
+		double invLen = 1.f / std::sqrt(vx2+ vz2);
 		up = Vector3(-v.z * invLen, 0.0f, v.x * invLen);
     } else {
-		double invLen = 1.0f / std::sqrtf(vy2 + vz2);
+		double invLen = 1.0f / std::sqrt(vy2 + vz2);
 		up = Vector3(0.0f, v.z * invLen, -v.y * invLen);
     }
     Vector3 left = v.cross(up);
@@ -403,10 +399,10 @@ Ray::Ray(Vector3 origin, Vector3 direction):origin(origin), direction(direction)
 void Ray::rotateToVector(Vector3 v) {
     Vector3 up;
     if (std::abs(v.x) > std::abs(v.y)) {
-		double invLen = 1.f / sqrtf(v.x * v.x + v.z * v.z);
+		double invLen = 1.f / sqrt(v.x * v.x + v.z * v.z);
 		up = Vector3(-v.z * invLen, 0.0f, v.x * invLen);
     } else {
-		double invLen = 1.0f / sqrtf(v.y * v.y + v.z * v.z);
+		double invLen = 1.0f / sqrt(v.y * v.y + v.z * v.z);
 		up = Vector3(0.0f, v.z * invLen, -v.y * invLen);
     }
     Vector3 left = v.cross(up);

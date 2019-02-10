@@ -62,10 +62,13 @@ Vector3 SpecularMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
 Sample3D SpecularMaterial::sample(Vector3 dir, Vector3 odir, Vector3 n, Sampler* sampler) {
     dir = Vector3() - dir;
     double cosi = dir.dot(n);
-    double fr = fresnel(cosi,  1, 1.6);
 
     double etai = 1;
-    double etat = 1.6;
+    double etat = 1.5;
+
+    double fr = fresnel(cosi, etai, etat);
+
+    
 
     if (cosi < 0.0) {
         cosi = -cosi;

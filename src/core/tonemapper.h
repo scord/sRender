@@ -19,7 +19,8 @@ public:
 
         for (int i = 0; i < radiance.size(); i++) {
             for (int j = 0; j < radiance[0].size(); j++) {
-                
+
+
                 double lum = ToneMapper::luminance(radiance[i][j]);
                 double scaledLuminance = lum*0.2/averageLuminance;
 
@@ -29,15 +30,6 @@ public:
                     radiance[i][j] = Vector3();
                 } else {
                     radiance[i][j] = radiance[i][j]*finalLuminance/lum;
-                    if (radiance[i][j].x > 1) {
-                        radiance[i][j].x = 1.0;
-                    }
-                    if (radiance[i][j].y > 1) {
-                        radiance[i][j].y = 1.0;
-                    } 
-                    if (radiance[i][j].z > 1) {
-                        radiance[i][j].z = 1.0;
-                    } 
                 }
                 
             }

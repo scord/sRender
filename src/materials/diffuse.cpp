@@ -11,7 +11,7 @@ DiffuseMaterial::DiffuseMaterial(Vector3 albedo, Vector3 emission) : hemisphere(
 }
 
 Vector3 DiffuseMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
-    return albedo*std::abs(dir.dot(n))*IPI;
+    return albedo*std::abs(odir.dot(n))*IPI;
 }
 
 Sample3D DiffuseMaterial::sample(Vector3 dir, Vector3 odir, Vector3 n, Sampler* sampler) {

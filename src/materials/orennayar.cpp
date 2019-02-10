@@ -1,10 +1,11 @@
 #include "orennayar.h"
 
 OrenNayarMaterial::OrenNayarMaterial() : hemisphere(Vector3(), 1) {
+    roughness = 0.2;
 }
 OrenNayarMaterial::OrenNayarMaterial(Vector3 albedo) : hemisphere(Vector3(), 1) {
     this->albedo = albedo;
-    roughness = 0.3;
+    roughness = 0.2;
 }
 OrenNayarMaterial::OrenNayarMaterial(Vector3 albedo, Vector3 emission) : hemisphere(Vector3(), 1) {
     this->albedo = albedo;

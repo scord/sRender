@@ -176,10 +176,10 @@ Shape::Shape(Vector3 p0) : p0(p0), isLight(false), objectToWorld(Transform(Vecto
 
 Plane::Plane(Vector3 p0, Vector3 n) : Shape(p0), n(n) {
     if (std::abs(n.x) > std::abs(n.y)) {
-		double invLen = 1.f / sqrtf(n.x * n.x + n.z * n.z);
+		double invLen = 1.f / sqrt(n.x * n.x + n.z * n.z);
 		up = Vector3(-n.z * invLen, 0.0f, n.x * invLen);
     } else {
-		double invLen = 1.0f / sqrtf(n.y * n.y + n.z * n.z);
+		double invLen = 1.0f / sqrt(n.y * n.y + n.z * n.z);
 		up = Vector3(0.0f, n.z * invLen, -n.y * invLen);
     }
     left = n.cross(up);

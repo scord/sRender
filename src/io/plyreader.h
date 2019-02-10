@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include "../core/geometry.h"
-#include "../materials/diffuse.h"
+#include "../materials/specular.h"
 #include "../core/scene.h"
 #include <memory>
 
@@ -33,12 +33,12 @@ public:
         return n;
     }
     Object* toObject(Vector3 pos, double scale) {
-        return new Object(toTriangles(), pos, scale, new DiffuseMaterial());
+        return new Object(toTriangles(), pos, scale, new SpecularMaterial());
     }
     KDTreeObject* toKDTreeObject(Vector3 pos, double scale) {
         std::vector<Shape*> test = toTriangles();
 
-        return new KDTreeObject(test, pos, scale, new DiffuseMaterial());
+        return new KDTreeObject(test, pos, scale, new SpecularMaterial());
     }
     std::vector<Shape*> toTriangles() {
         std::vector<Shape*> triangles;

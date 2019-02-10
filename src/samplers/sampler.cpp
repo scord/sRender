@@ -7,6 +7,7 @@ Sampler::Sampler(int n, int spp, int d) {
     std::random_device rd;
     std::mt19937 gen(rd());
     dis = std::uniform_real_distribution<double>(0,1);
+    
     this->gen = gen;
   /*  for (int x = 0; x < n; x++) {
             for (int i = 0; i < grid_size; i++) {

@@ -18,7 +18,7 @@ double median(std::vector<double> values) {
 KDTreeNode::KDTreeNode(BoundingBox box, std::vector<Shape*> geometry, int depth) : aabb(box){
 
     isLeaf = false;
-    if (depth >= 20 || geometry.size() <= 1) {
+    if (depth >= 8 || geometry.size() <= 1) {
         isLeaf = true;
         for (auto shape : geometry) {
             this->geometry.push_back((shape));
