@@ -67,13 +67,17 @@ Vector3 Integrator::getDirectIllumination(Interaction* interactionP, Scene* scen
 Vector3 Integrator::getDirectIlluminationMIS(Interaction* interactionP, Interaction* nextInteractionP, Scene* scene, Disc* light, Sampler* sampler) {    
     
     Sample3D lightSample = light->sample(sampler->getRandomDouble(), sampler->getRandomDouble());
-    Ray ray(interactionP->position, (lightSample.value - interactionP->position).norm());
+
+    Interaction interaction = *interactionP;
+    Interaction nextInteraction = *nextInteractionP;
+
+    Ray ray(interaction.position, (lightSample.value - interaction.position).norm());
 
     Interaction* lightInteractionP = scene->intersect(ray);
     Interaction lightInteraction = *lightInteractionP;
     delete lightInteractionP;
     
-    Vector3 n = interactionP->normal;
+    Vector3 n = interaction.normal;
     Vector3 lightN = lightInteraction.normal;
 
     Vector3 lightContribution = Vector3();
@@ -83,48 +87,35 @@ Vector3 Integrator::getDirectIlluminationMIS(Interaction* interactionP, Interact
     Vector3 brdfContribution = Vector3();
     double brdfWeight = 0;
     double brdfPdf = 0; 
-
-    
     
     Vector3 lightEmission = lightInteraction.material->emission;
 
-    
-
     if (lightEmission != Vector3()) {
-       
         double cost2 = std::abs(lightN.dot(Vector3()-ray.direction.norm()));
         double lightRayLengthSquared = std::pow((lightInteraction.position - ray.origin).length(),2);
         double solidAngle = cost2*light->area / (lightRayLengthSquared);
         lightPdf = 1/solidAngle;
 
-        Interaction directInteraction(interactionP->odir, ray.direction, interactionP->position, interactionP->normal, interactionP->material, true);
+        Interaction directInteraction(interaction.odir, ray.direction, interaction.position, interaction.normal, interaction.material, true);
 
         lightWeight = powerHeuristicDividedByPdf(lightPdf, directInteraction.getPdf());
         lightContribution = lightEmission*directInteraction.getBrdf();
-    } 
-    
-    if (nextInteractionP && nextInteractionP->material->emission != Vector3()) {
+    }
 
-        double cost2 = std::abs(nextInteractionP->normal.dot(nextInteractionP->odir));
-        double lightRayLength = (nextInteractionP->position - interactionP->position).length();
+    if (nextInteraction.material->emission != Vector3()) {
+
+        double cost2 = std::abs(nextInteraction.normal.dot(nextInteraction.odir));
+        double lightRayLength = (nextInteraction.position - interaction.position).length();
         double solidAngle = cost2*light->area / (lightRayLength*lightRayLength);
         double lightPdf2 = 1/solidAngle;
 
-        brdfPdf = interactionP->getPdf();
+        brdfPdf = interaction.getPdf();
         brdfWeight = powerHeuristicDividedByPdf(brdfPdf, lightPdf2);
 
-        brdfContribution = nextInteractionP->material->emission*interactionP->getBrdf();
+        brdfContribution = nextInteraction.material->emission*interaction.getBrdf();
     }
-
-    if (lightContribution != Vector3() && brdfContribution != Vector3()) {
-        return lightContribution*lightWeight + brdfContribution*brdfWeight;
-    } else if (lightContribution != Vector3()) {
-        return lightContribution/lightPdf;
-    } else if (brdfContribution != Vector3()) {
-        return brdfContribution/brdfPdf;
-    } else {
-        return Vector3();
-    }
+    return lightContribution*lightWeight + brdfContribution*brdfWeight;
+   
 }
 
 Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Disc* light, Sampler* sampler) {

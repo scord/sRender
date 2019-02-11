@@ -27,11 +27,11 @@ std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::v
 
 int main() {
 
-	Camera cam(Vector3(0,0,3), 700, 700, PI/6);
+	Camera cam(Vector3(0,0,3), 400, 400, PI/6);
 
 	Scene scene;
 
-	PLYReader reader("/home/sam/dev/sRender/src/dragon.ply");
+	//PLYReader reader("/home/sam/dev/sRender/src/dragon.ply");
 
 	//scene.add(reader.toObject(Vector3(-0.25,-1,-0.5), 4));
 
@@ -94,7 +94,7 @@ int main() {
 	
 	// prepare tiles
 
-	int tileCount = 7;
+	int tileCount = 4;
 	int tileWidth = cam.width/tileCount;
 	std::vector<std::vector<std::vector<Vector3>>> tiles;
 

@@ -293,7 +293,7 @@ double Sphere::Intersect(Ray ray, Vector3& intersection) {
     double s1 = -b + d;
     double s2 = -b - d;
     
-    double t = (s2>0.0000001) ? s2/2 : ((s1>0.0000001) ? s1/2 : 0);
+    double t = (s2>0.000000001) ? s2/2 : ((s1>0.00000001) ? s1/2 : 0);
     intersection = ray.origin + ray.direction*t;
     return t;
 
