@@ -13,10 +13,10 @@ public:
     GGXMaterial(Vector3 albedo);
     GGXMaterial(Vector3 albedo, Vector3 emission);
     GGXMaterial(Vector3 albedo, double roughness);
-    Hemisphere hemisphere;
     double roughness;
     double alpha;
     double alpha2;
+    Vector3 specularAlbedo;
     double distribution(double cost);
     double masking(double cost);
     double fresnel(double etai, double etat, double cost);

@@ -1,24 +1,28 @@
 #include "ggx.h"
 
-GGXMaterial::GGXMaterial() : hemisphere(Vector3(), 1) {
-    roughness = 0.4;
+GGXMaterial::GGXMaterial() {
+    roughness = 0.5;
     alpha = roughness * roughness;
     alpha2 = alpha*alpha;
 }
-GGXMaterial::GGXMaterial(Vector3 albedo) : hemisphere(Vector3(), 1) {
+GGXMaterial::GGXMaterial(Vector3 albedo) {
     this->albedo = albedo;
-    roughness = 0.4;
+    specularAlbedo = Vector3(0.3,0.3,0.3);
+    this->roughness = 0.5;
     alpha = roughness * roughness;
     alpha2 = alpha*alpha;
 }
 
-GGXMaterial::GGXMaterial(Vector3 albedo, Vector3 emission) : hemisphere(Vector3(), 1) {
+GGXMaterial::GGXMaterial(Vector3 albedo, Vector3 emission) {
     this->albedo = albedo;
     this->emission = emission;
 }
 
-GGXMaterial::GGXMaterial(Vector3 albedo, double roughness) : hemisphere(Vector3(), 1), roughness(roughness) {
+GGXMaterial::GGXMaterial(Vector3 albedo, double roughness) : roughness(roughness) {
     this->albedo = albedo;
+    specularAlbedo = Vector3(0.3,0.3,0.3);
+    alpha = roughness * roughness;
+    alpha2 = alpha*alpha;
 }
 
 double GGXMaterial::distribution(double cost) {
@@ -53,13 +57,13 @@ Vector3 GGXMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
     double go = masking(costr);
     double gi = masking(costi);
     double f = fresnel(etai, etat, odir.dot(wh));
+
+    Vector3 diffuse = (albedo*IPI)*(Vector3(1,1,1)-specularAlbedo)*(28/23)*(1-pow(1-costi/2, 5))*(1-pow(1-costr/2, 5));
     
-    return albedo*d*go*gi*f*costi;
+    return (specularAlbedo*d*go*gi*f + diffuse)*costi;
 }
 
 Sample3D GGXMaterial::sample(Vector3 idir, Vector3 odir, Vector3 n, Sampler* sampler) {
-    Sample3D sample = hemisphere.map(sampler->getSample2D());
-   // Vector3 test = sample.value.rotationMatrix()*n ;
 
     double r0 = sampler->getRandomDouble();
     double cost = std::sqrt((1 - r0)/((alpha2-1)*r0 + 1));

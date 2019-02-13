@@ -15,11 +15,15 @@ Interaction::Interaction(Vector3 odir, Vector3 idir, Vector3 pos, Vector3 n, Mat
 
 }
 
-void Interaction::sample(Sampler* sampler) {
+Sample3D Interaction::sample(Sampler* sampler) {
     if (backward) {
-        idir = material->sample(odir, idir, normal, sampler).value;
+        Sample3D sample = material->sample(odir, idir, normal, sampler);
+        idir = sample.value;
+        return sample;
     } else {
-        odir = material->sample(idir, odir, normal, sampler).value;
+        Sample3D sample = material->sample(idir, odir, normal, sampler);
+        odir = sample.value;
+        return sample;
     }
 }
 

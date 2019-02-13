@@ -17,7 +17,7 @@ public:
     Ray getOutgoing();
     Ray getIncoming();
 
-    void sample(Sampler* sampler);
+    Sample3D sample(Sampler* sampler);
     double getPdf();
     Vector3 getBrdf();
 

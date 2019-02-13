@@ -27,7 +27,7 @@ std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::v
 
 int main() {
 
-	Camera cam(Vector3(0,0,3), 400, 400, PI/6);
+	Camera cam(Vector3(0,0,3), 600, 600, PI/6);
 
 	Scene scene;
 
@@ -67,8 +67,12 @@ int main() {
 	// SPHERE
 
 
-	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.4, -0.6, 0.3), 0.4)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
-	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(-0.3, -0.6, -0.25), 0.4)}, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.95,0.95,0.95))));
+	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.4, -0.7, 0.5), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
+//scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.5, 0.3, 0.2), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
+//	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.2, -0.1, -0.5), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
+
+	
+	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(-0.3, -0.6, -0.35), 0.4)}, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.55,0.35,0.95), 0.4)));
 
 
 	Shape* areaLight = new Disc(Vector3(0,0.999,0), Vector3(0,-1,0), Vector2(0.5,0.5));
@@ -88,7 +92,7 @@ int main() {
         }
     }
 
-	int samplesPerPixel = 16;
+	int samplesPerPixel = 8;
 	
 	auto start = std::chrono::high_resolution_clock::now();
 	
