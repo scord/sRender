@@ -22,7 +22,7 @@ public:
 
 
                 double lum = ToneMapper::luminance(radiance[i][j]);
-                double scaledLuminance = lum*0.2/averageLuminance;
+                double scaledLuminance = lum*0.3/averageLuminance;
 
                 double finalLuminance = scaledLuminance/(1+scaledLuminance);
 
@@ -31,6 +31,12 @@ public:
                 } else {
                     radiance[i][j] = radiance[i][j]*finalLuminance/lum;
                 }
+                if (radiance[i][j].x > 1)
+                    radiance[i][j].x = 1;
+                if (radiance[i][j].y > 1)
+                    radiance[i][j].y = 1;
+                if (radiance[i][j].z > 1)
+                    radiance[i][j].z = 1;
                 
             }
         }

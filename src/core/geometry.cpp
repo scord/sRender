@@ -265,7 +265,7 @@ double Quad::Intersect(Ray ray, Vector3& intersection) {
     double t = Plane::Intersect(ray, intersection);
     Vector3 d = intersection - p0;
     Vector2 dist = Vector2(d.dot(left), d.dot(up));
-    if (dist.x <= size.x && dist.x > -size.x && dist.y <= size.y && dist.y > -size.y) {
+    if (std::abs(dist.x) <= size.x && std::abs(dist.y) <= size.y) {
         return t; 
     } else {
         return -1;

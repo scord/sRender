@@ -19,9 +19,9 @@ OrenNayarMaterial::OrenNayarMaterial(Vector3 albedo, double roughness) : hemisph
 Vector3 OrenNayarMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
 
     Vector3 notParallel(dir.z, dir.y, dir.x);
-    Vector3 perp = ((notParallel - n)*notParallel.dot(n)).norm();
-    Vector3 dirPerp = ((dir - n)*dir.dot(n)).norm();
-    Vector3 odirPerp = ((odir = n)*odir.dot(n)).norm();
+    Vector3 perp = (notParallel - n*notParallel.dot(n)).norm();
+    Vector3 dirPerp = (dir - n*dir.dot(n)).norm();
+    Vector3 odirPerp = (odir - n*odir.dot(n)).norm();
     double cospi = std::abs(dirPerp.dot(perp));
     double cospr = std::abs(odirPerp.dot(perp));
     double costi = std::abs(dir.dot(n));
@@ -47,8 +47,6 @@ Vector3 OrenNayarMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
 
 Sample3D OrenNayarMaterial::sample(Vector3 idir, Vector3 odir, Vector3 n, Sampler* sampler) {
     Sample3D sample = hemisphere.map(sampler->getSample2D());
-   // Vector3 test = sample.value.rotationMatrix()*n ;
-
     return Sample3D(sample.value.rotate(n), sample.pdf);
 }
 

@@ -119,33 +119,39 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Disc* light, S
         delete nextInteractionP;
         return emission;
     }
+
     int i = 0;
-    int maxDepth = 6;
-    while (i < maxDepth && throughput != Vector3()) {
+    while (i < depth && throughput != Vector3()) {
         interactionP = nextInteractionP;
+
+        // sample brdf at interaction
         Sample3D sample = interactionP->sample(sampler);
 
         nextInteractionP = scene->intersect(interactionP->getIncoming());
         if (!nextInteractionP) {
+            colour += throughput*getDirectIllumination(interactionP, scene, light, sampler);
             break;
         }
-       
-        Vector3 directLighting = Vector3();
   
-        // don't directly sample lights if pdf is a delta function
         if (sample.pdf != 1) {
+            // sample lights
+
             if (nextInteractionP->material->emission != Vector3()) {
-                directLighting = getDirectIlluminationMIS(interactionP, nextInteractionP, scene, light, sampler);
-                colour = colour + throughput*directLighting;
-                i = maxDepth;
+                // use multiple importance sampling if ray sampled from brdf also hits light
+                
+                colour += throughput*getDirectIlluminationMIS(interactionP, nextInteractionP, scene, light, sampler);
+                i = depth;
             } else {
-                directLighting = getDirectIllumination(interactionP, scene, light, sampler);
-                colour = colour + throughput*directLighting;
+                colour += throughput*getDirectIllumination(interactionP, scene, light, sampler);
             }
             throughput = throughput * interactionP->getBrdf() / sample.pdf;
         } else if (nextInteractionP->material->emission != Vector3()) {
+            // don't directly sample lights if pdf is a delta function
+
+            // brdf is actually brdf multiplied by cosine factor
+            throughput = throughput * interactionP->getBrdf() / sample.pdf;
             colour = colour + throughput*nextInteractionP->material->emission;
-            i = maxDepth;
+            i = depth;
         }
 
         i++; 

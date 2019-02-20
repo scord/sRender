@@ -17,10 +17,13 @@ public:
     Ray getOutgoing();
     Ray getIncoming();
 
+    double cost;
     Sample3D sample(Sampler* sampler);
+    Sample3D sample(Sampler* sampler, Vector3& reflectance);
     double getPdf();
     Vector3 getBrdf();
 
+    Vector3 getReflectance();
     Vector3 position;
     Vector3 normal;
     Vector3 odir;

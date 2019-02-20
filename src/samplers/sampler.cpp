@@ -7,6 +7,7 @@ Sampler::Sampler(int n, int spp, int d) {
     std::mt19937 gen(rd());
     dis = std::uniform_real_distribution<double>(0,1);
     gridSize = std::sqrt(spp);
+    gridSize2 = gridSize*gridSize;
     i = 0;
     this->gen = gen;
 }
@@ -26,7 +27,7 @@ Vector3 Sampler::quadToHemisphere(double u1, double u2) {
 
 Sample2D Sampler::getStratifiedSample() {
 
-    i = i % (gridSize*gridSize);
+    i = i % (gridSize2);
     int x = int(i/gridSize);
     int  y = i % gridSize;
     i++;

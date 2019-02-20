@@ -21,13 +21,15 @@
 #include "materials/mirror.h"
 #include "materials/orennayar.h"
 #include "materials/ggx.h"
+#include "materials/blendmaterial.h"
+#include "materials/fresnelblend.h"
 #define PI 3.1415926536
 
 std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth, Disc light);
 
 int main() {
 
-	Camera cam(Vector3(0,0,3), 600, 600, PI/6);
+	Camera cam(Vector3(0,0,3), 400, 400, PI/6);
 
 	Scene scene;
 
@@ -54,9 +56,13 @@ int main() {
 	std::vector<Shape*> greenRoomGeometry;
 	greenRoomGeometry.push_back(new Quad(Vector3(-1,0,0), Vector3(1,0,0), Vector2(1.0,1), Vector3(0,0,-1)));
 	
-	scene.add(new Object(redRoomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.9,0.1,0.1))));
-	scene.add(new Object(greenRoomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.1,0.9,0.1))));
-	scene.add(new Object(roomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.9,0.9,0.9))));
+	GGXMaterial* ggx = new GGXMaterial(Vector3(1.0,1.0,1.0), Vector3(0.9,0.5,0.5), 0.2);
+	OrenNayarMaterial* on = new OrenNayarMaterial(Vector3(0.9, 0.1, 0.1), 0.2);
+
+
+	scene.add(new Object(redRoomGeometry, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.5,0.1,0.1), 0.5)));
+	scene.add(new Object(greenRoomGeometry, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.1,0.5,0.1), 0.5)));
+	scene.add(new Object(roomGeometry, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.4,0.4,0.4), 0.5)));
 	// BOX
 	//scene.push_back(new Quad(Vector3(-0.5,0.1,-0.5), Vector3(0,1,0), Vector3(1,1,1), new DiffuseMaterial(), Vector2(0.25,0.25), Vector3(0,0,-1)));
 	//scene.push_back(new Quad(Vector3(-0.75,-0.45,-0.5), Vector3(-1,0,0), Vector3(1,1,1), new DiffuseMaterial(), Vector2(0.25,0.55), Vector3(0,1,0)));
@@ -70,10 +76,8 @@ int main() {
 	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.4, -0.7, 0.5), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
 //scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.5, 0.3, 0.2), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
 //	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.2, -0.1, -0.5), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
-
 	
-	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(-0.3, -0.6, -0.35), 0.4)}, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.55,0.35,0.95), 0.4)));
-
+	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(-0.3, -0.6, -0.35), 0.4)}, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.9,0.1,0.1), Vector3(1.0,1.0,1.0), 0.2)));
 
 	Shape* areaLight = new Disc(Vector3(0,0.999,0), Vector3(0,-1,0), Vector2(0.5,0.5));
 	areaLight->isLight = true;
@@ -92,7 +96,7 @@ int main() {
         }
     }
 
-	int samplesPerPixel = 8;
+	int samplesPerPixel = 64;
 	
 	auto start = std::chrono::high_resolution_clock::now();
 	
@@ -119,7 +123,7 @@ int main() {
 	std::vector<std::future<std::vector<std::vector<Vector3>>>> resultTiles;
 
 	for (int t = 0; t < tileCount; t++) {
-		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 5, *static_cast<Disc*>(areaLight)));
+		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 6, *static_cast<Disc*>(areaLight)));
 	}
 
 	int k = 0;
@@ -177,15 +181,10 @@ std::vector<std::vector<Vector3>> renderTile(int tileNumber, std::vector<std::ve
 	for (int i=0; i < tile.size(); i++) {
 			
 		for (int j=0; j < tile[0].size(); j++) {
-
-
 			for (int n=0; n < samplesPerPixel; n++) {
-
-				Ray ray = cam.pixelToRay(Vector2(tileNumber*tileWidth+i, j) + pixelSampler->getStratifiedSample().value);
-				
-				Vector3 colour = pathTracer.getRadiance(ray, 0, &scene, &light, pixelSampler);
+				Ray ray = cam.pixelToRay(Vector2(tileNumber*tileWidth+i, j) + pixelSampler->getStratifiedSample().value);	
+				Vector3 colour = pathTracer.getRadiance(ray, maxDepth, &scene, &light, pixelSampler);
 				tile[i][j] += colour/samplesPerPixel;
-
 			}
 		}
 	}

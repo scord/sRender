@@ -16,6 +16,7 @@ public:
     double getRandomDouble();
     std::mt19937 gen;
     int gridSize;
+    int gridSize2;
     int i;
     Vector3 quadToHemisphere(double u1, double u2);
     int stratifiedSampleNumber;
