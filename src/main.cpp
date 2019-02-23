@@ -60,9 +60,9 @@ int main() {
 	OrenNayarMaterial* on = new OrenNayarMaterial(Vector3(0.9, 0.1, 0.1), 0.2);
 
 
-	scene.add(new Object(redRoomGeometry, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.5,0.1,0.1), 0.5)));
-	scene.add(new Object(greenRoomGeometry, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.1,0.5,0.1), 0.5)));
-	scene.add(new Object(roomGeometry, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.4,0.4,0.4), 0.5)));
+	scene.add(new Object(redRoomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.5,0.1,0.1), 0.5)));
+	scene.add(new Object(greenRoomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.1,0.5,0.1), 0.5)));
+	scene.add(new Object(roomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.4,0.4,0.4), 0.5)));
 	// BOX
 	//scene.push_back(new Quad(Vector3(-0.5,0.1,-0.5), Vector3(0,1,0), Vector3(1,1,1), new DiffuseMaterial(), Vector2(0.25,0.25), Vector3(0,0,-1)));
 	//scene.push_back(new Quad(Vector3(-0.75,-0.45,-0.5), Vector3(-1,0,0), Vector3(1,1,1), new DiffuseMaterial(), Vector2(0.25,0.55), Vector3(0,1,0)));
@@ -73,11 +73,11 @@ int main() {
 	// SPHERE
 
 
-	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.4, -0.7, 0.5), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
+//	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.4, -0.6, 0.5), 0.4)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
 //scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.5, 0.3, 0.2), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
 //	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.2, -0.1, -0.5), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
 	
-	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(-0.3, -0.6, -0.35), 0.4)}, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.9,0.1,0.1), Vector3(1.0,1.0,1.0), 0.2)));
+	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(-0.3, -0.6, -0.35), 0.4)}, Vector3(0,0,0), 1, new FresnelBlend(Vector3(0.75,0.5,0.25), Vector3(0.5,0.5,0.5), 0.5)));
 
 	Shape* areaLight = new Disc(Vector3(0,0.999,0), Vector3(0,-1,0), Vector2(0.5,0.5));
 	areaLight->isLight = true;
@@ -96,7 +96,7 @@ int main() {
         }
     }
 
-	int samplesPerPixel = 64;
+	int samplesPerPixel = 16;
 	
 	auto start = std::chrono::high_resolution_clock::now();
 	

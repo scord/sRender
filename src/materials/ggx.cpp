@@ -38,26 +38,26 @@ double GGXMaterial::distribution(double cost) {
 }
 
 double GGXMaterial::masking(double cost) {
-    return 1/(cost + std::sqrt(alpha2 + (1-alpha2)*(cost*cost)));
+    return (2.0*cost)/(cost + std::sqrt(alpha2 + (1-alpha2)*(cost*cost)));
 }
 
 double GGXMaterial::g2(double costi, double costr) {
-    return 1.0/(costr*std::sqrt(alpha2+(1-alpha2)*costi*costi) + costi*std::sqrt(alpha2+(1-alpha2)*costr*costr) );
+    return 2.0*costi*costr/(costr*std::sqrt(alpha2+(1-alpha2)*costi*costi) + costi*std::sqrt(alpha2+(1-alpha2)*costr*costr) );
 }
 
 double GGXMaterial::fresnel(double etai, double etat, double cost) {
     double f0 = std::pow((etai - etat)/(etai+etat), 2);
-    return f0 + (1-f0)*(1-std::pow(1-cost, 5));
+    return f0 + (1-f0)*(std::pow(1-cost, 5));
 }
 
 Vector3 GGXMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
     double costi = n.dot(dir);
-    if (costi < 0) {
+    if (costi < 0.0) {
         return Vector3();
     }
 
     double etai = 1.0;
-    double etat = 1.5;
+    double etat = 20.0;
 
     Vector3 wh = (dir+odir).norm();
 
@@ -66,11 +66,9 @@ Vector3 GGXMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
 
     double d = distribution(cost);
     double g = g2(costi, costr);
-    double f = fresnel(etai, etat, odir.dot(wh));
+    double f = fresnel(etai, etat, dir.dot(wh));
 
-    return (specularAlbedo*d*g*f/2.0)*costi;
-
-   // return specularAlbedo*d*g*f
+    return (specularAlbedo*d*f*g2(costi,costr)/(4*costi*costr))*costi;
 }
 /*
 Sample3D GGXMaterial::sample(Vector3 idir, Vector3 odir, Vector3 n, Sampler* sampler) {
@@ -117,23 +115,23 @@ Sample3D GGXMaterial::sample(Vector3 idir, Vector3 odir, Vector3 n, Sampler* sam
         double p1 = r*std::cos(theta);
         double p2 = r*std::sin(theta);
         t = t2*p2 + t1*p1;
-        length = std::sqrt(1-p1*p1-p2*p2);
+        length = std::sqrt(std::max(0.0,1.0-p1*p1-p2*p2));
     } else {
-        double theta = PI + (u2 - a) / (1-a) * PI ;
+        double theta = (u2 - a) / (1-a) * PI ;
         double p1 = r*std::cos(theta);
         double p2 = r*std::sin(theta);
         t = dirPerp*p2 + t1*p1;
-        length = std::sqrt(1-p1*p1-p2*p2);
+        length = std::sqrt(std::max(0.0,1.0-p1*p1-p2*p2));
     }
 
-    Vector3 mn = (t+stretchedDir*length).norm();
+    Vector3 mn = (t+stretchedDir*length);
     dirPerp = mn - n*mn.dot(n);
     Vector3 wm = (dirPerp*alpha + n*mn.dot(n)).norm();
 
     Vector3 wi = ((Vector3() - idir) - wm*((Vector3() - idir).dot(wm)*2));
 
     double d = distribution(wm.dot(n));
-    double pdf = masking(wi.dot(wm))*(d) / (2);
+    double pdf = masking(idir.dot(n))*d / (idir.dot(n)*4);
     return Sample3D(wi, pdf);
 }
 
@@ -161,6 +159,7 @@ Vector3 GGXMaterial::reflectance(Vector3 idir, Vector3 odir, Vector3 n) {
 double GGXMaterial::getPdf(Vector3 idir, Vector3 odir, Vector3 n) {
     Vector3 wm = (idir + odir).norm();
     double d = distribution(wm.dot(n));
-    return masking(odir.dot(wm))*d / 2;
+    return masking(odir.dot(n))*d / (odir.dot(n)*4);
 }
+
 
