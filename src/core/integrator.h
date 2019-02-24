@@ -11,7 +11,7 @@ public:
     Integrator();
     Integrator(int maxDepth);
     int maxDepth;
-    Vector3 getRadiance(Ray ray, int depth, Scene* scene, Disc* light, Sampler* sampler);
+    Vector3 getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampler);
     Vector3 getDirectIlluminationMIS(Interaction* interaction, Interaction* nextInteractionP, Scene* scene, Disc* light, Sampler* sampler);
     Vector3 getDirectIllumination(Interaction* interaction, Scene* scene, Disc* light, Sampler* sampler);
     Vector3 getIllumination(Interaction* interaction, Interaction* nextInteractionP, Scene* scene, Sampler* sampler);

@@ -13,6 +13,15 @@ void Scene::add(Object* object) {
     }
 }
 
+void Scene::addLight(Object* object) {
+    objects.push_back(object);
+    lights.push_back(object);
+}
+
+Object* Scene::getLight() {
+    return lights[0];
+}
+
 Interaction* Scene::intersect(Ray ray) {
 
     double minT = 99999;

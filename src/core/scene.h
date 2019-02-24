@@ -32,11 +32,13 @@ public:
 class Scene {
 public:
     std::vector<Object*> objects;
+    std::vector<Object*> lights;
     std::vector<Shape*> lightGeometry;
 
     Scene();
     void add(Object* object);
-
+    void addLight(Object* object);
+    Object* getLight();
     Interaction* intersect(Ray ray);
 
     Ray sampleLight();

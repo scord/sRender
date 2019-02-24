@@ -25,7 +25,7 @@
 #include "materials/fresnelblend.h"
 #define PI 3.1415926536
 
-std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth, Disc light);
+std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth);
 
 int main() {
 
@@ -45,7 +45,7 @@ int main() {
 	std::vector<Shape*> roomGeometry;
 
 
-	roomGeometry.push_back(new Quad(Vector3(0,1,0), Vector3(0,-1,0), Vector2(1.0,1.0), Vector3(0,0,-1)));
+	//roomGeometry.push_back(new Quad(Vector3(0,1,0), Vector3(0,-1,0), Vector2(1.0,1.0), Vector3(0,0,-1)));
 	roomGeometry.push_back(new Quad(Vector3(0,-1,0), Vector3(0,1,0), Vector2(1.0,1.0), Vector3(0,0,-1)));
 	roomGeometry.push_back(new Quad(Vector3(0,0,-1), Vector3(0,0,1), Vector2(1.0,1.0), Vector3(0,1,0)));
 	roomGeometry.push_back(new Quad(Vector3(0,0,1), Vector3(0,0,-1), Vector2(1.0,1.0), Vector3(0,1,0)));
@@ -77,15 +77,22 @@ int main() {
 //scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.5, 0.3, 0.2), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
 //	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.2, -0.1, -0.5), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
 	
-	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(-0.3, -0.6, -0.35), 0.4)}, Vector3(0,0,0), 1, new FresnelBlend(Vector3(0.75,0.5,0.25), Vector3(0.5,0.5,0.5), 0.5)));
+	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(-0.3, -0.6, -0.35), 0.4)}, Vector3(0,0,0), 1, new FresnelBlend(Vector3(0.8,0.3,0.1), Vector3(0.4,0.4,0.4), 0.4)));
 
-	Shape* areaLight = new Disc(Vector3(0,0.999,0), Vector3(0,-1,0), Vector2(0.5,0.5));
+	Shape* areaLight = new Disc(Vector3(-0.5,0.999,0), Vector3(0,-1,0), Vector2(0.3,0.3));
+	areaLight->isLight = true;
+
+	Shape* areaLight2 = new Disc(Vector3(0.5,0.999,0), Vector3(0,-1,0), Vector2(0.3,0.3));
 	areaLight->isLight = true;
 
 	std::vector<Shape*> lightGeometry;
 	lightGeometry.push_back(areaLight);
+
+	std::vector<Shape*> lightGeometry2;
+	lightGeometry.push_back(areaLight2);
 	
-	scene.add(new Object(lightGeometry, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(1000,900,800))));
+	scene.addLight(new Object(lightGeometry, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(1000,900,800))));
+	scene.addLight(new Object(lightGeometry2, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(1000,900,800))));
 
 	std::vector<std::vector<Vector3>> image;
 
@@ -123,7 +130,7 @@ int main() {
 	std::vector<std::future<std::vector<std::vector<Vector3>>>> resultTiles;
 
 	for (int t = 0; t < tileCount; t++) {
-		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 6, *static_cast<Disc*>(areaLight)));
+		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 6));
 	}
 
 	int k = 0;
@@ -168,7 +175,7 @@ int main() {
 }
 
 
-std::vector<std::vector<Vector3>> renderTile(int tileNumber, std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth, Disc light) {
+std::vector<std::vector<Vector3>> renderTile(int tileNumber, std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth) {
 
 	
 
@@ -183,7 +190,7 @@ std::vector<std::vector<Vector3>> renderTile(int tileNumber, std::vector<std::ve
 		for (int j=0; j < tile[0].size(); j++) {
 			for (int n=0; n < samplesPerPixel; n++) {
 				Ray ray = cam.pixelToRay(Vector2(tileNumber*tileWidth+i, j) + pixelSampler->getStratifiedSample().value);	
-				Vector3 colour = pathTracer.getRadiance(ray, maxDepth, &scene, &light, pixelSampler);
+				Vector3 colour = pathTracer.getRadiance(ray, maxDepth, &scene, pixelSampler);
 				tile[i][j] += colour/samplesPerPixel;
 			}
 		}

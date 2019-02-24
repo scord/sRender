@@ -23,6 +23,7 @@ public:
     double masking(double cost);
     double g2(double costi, double costr);
     double fresnel(double etai, double etat, double cost);
+    Vector3 fresnel(Vector3 r0, double cost);
     virtual double getPdf(Vector3 dir, Vector3 odir, Vector3 n);
     virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n);
     virtual Sample3D sample(Vector3 dir, Vector3 odir, Vector3 n, Sampler* sampler);

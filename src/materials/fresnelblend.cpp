@@ -50,14 +50,15 @@ double FresnelBlend::fresnel(double etai, double etat, double cost) {
     return f0 + (1-f0)*std::pow(1-cost, 5);
 }
 
+Vector3 FresnelBlend::fresnel(Vector3 r0, double cost) {
+    return r0 + (Vector3(1,1,1) - r0)*std::pow(1-cost, 5);
+}
+
 Vector3 FresnelBlend::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
     double costi = n.dot(dir);
     if (costi < 0) {
         return Vector3();
     }
-
-    double etai = 1.0;
-    double etat = 10.4;
 
     Vector3 wh = (dir+odir).norm();
 
@@ -68,7 +69,7 @@ Vector3 FresnelBlend::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
 
     double g = g2(costi, costr);
     double c = odir.dot(wh);
-    double f = fresnel(etai, etat, dir.dot(wh));
+    Vector3 f = fresnel(specularAlbedo, dir.dot(wh));
 
     Vector3 diffuse = (albedo*IPI)*(Vector3(1,1,1)-specularAlbedo)*(28.0/23.0)*(1-std::pow(1-costi/2, 5))*(1-std::pow(1-costr/2, 5));
     

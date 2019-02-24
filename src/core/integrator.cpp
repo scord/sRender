@@ -102,7 +102,7 @@ Vector3 Integrator::getDirectIlluminationMIS(Interaction* interactionP, Interact
    
 }
 
-Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Disc* light, Sampler* sampler) {
+Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampler) {
 
     Vector3 throughput = Vector3(1,1,1);
     Vector3 colour = Vector3(0,0,0);
@@ -129,7 +129,7 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Disc* light, S
 
         nextInteractionP = scene->intersect(interactionP->getIncoming());
         if (!nextInteractionP) {
-            colour += throughput*getDirectIllumination(interactionP, scene, light, sampler);
+            colour += throughput*getDirectIllumination(interactionP, scene, static_cast<Disc*>(scene->getLight()->geometry[0]), sampler);
             break;
         }
   
@@ -139,10 +139,10 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Disc* light, S
             if (nextInteractionP->material->emission != Vector3()) {
                 // use multiple importance sampling if ray sampled from brdf also hits light
                 
-                colour += throughput*getDirectIlluminationMIS(interactionP, nextInteractionP, scene, light, sampler);
+                colour += throughput*getDirectIlluminationMIS(interactionP, nextInteractionP, scene, static_cast<Disc*>(scene->getLight()->geometry[0]), sampler);
                 i = depth;
             } else {
-                colour += throughput*getDirectIllumination(interactionP, scene, light, sampler);
+                colour += throughput*getDirectIllumination(interactionP, scene, static_cast<Disc*>(scene->getLight()->geometry[0]), sampler);
             }
             throughput = throughput * interactionP->getBrdf() / sample.pdf;
         } else if (nextInteractionP->material->emission != Vector3()) {
