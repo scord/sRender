@@ -37,13 +37,25 @@ double FresnelBlend::distribution(double cost) {
     return alpha2/(PI*std::pow(cos2t*(alpha2 - 1) + 1,2));
 }
 
-double FresnelBlend::masking(double cost) {
+// masking
+double FresnelBlend::g1(double cost) {
     return 2.0*cost/(cost + std::sqrt(alpha2 + (1-alpha2)*(cost*cost)));
 }
+/*
+double FresnelBlend::g1DividedBy2Cos(double cost) {
+    return 1.0/(cost + std::sqrt(alpha2 + (1-alpha2)*(cost*cost)));
+}*/
 
-double FresnelBlend::g2(double costi, double costr) {
-    return 2.0*costi*costr/(costr*std::sqrt(alpha2+(1-alpha2)*costi*costi) + costi*std::sqrt(alpha2+(1-alpha2)*costr*costr) );
+// masking shadowing
+double FresnelBlend::g2(double costi, double costo) {
+    return 2.0*costi*costo/(costo*std::sqrt(alpha2+(1-alpha2)*costi*costi) + costi*std::sqrt(alpha2+(1-alpha2)*costo*costo) );
 }
+/*
+double FresnelBlend::g2DividedBy2CosiCoso(double costi, double costo) {
+    return 1.0/(costo*std::sqrt(alpha2+(1-alpha2)*costi*costi) + costi*std::sqrt(alpha2+(1-alpha2)*costo*costo) );
+}*/
+
+
 
 double FresnelBlend::fresnel(double etai, double etat, double cost) {
     double f0 = std::pow((etai - etat)/(etai+etat), 2);
@@ -63,17 +75,17 @@ Vector3 FresnelBlend::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
     Vector3 wh = (dir+odir).norm();
 
     double cost = n.dot(wh);
-    double costr = n.dot(odir);
+    double costo = n.dot(odir);
 
     double d = distribution(cost);
 
-    double g = g2(costi, costr);
+    double g = g2(costi, costo);
     double c = odir.dot(wh);
     Vector3 f = fresnel(specularAlbedo, dir.dot(wh));
 
-    Vector3 diffuse = (albedo*IPI)*(Vector3(1,1,1)-specularAlbedo)*(28.0/23.0)*(1-std::pow(1-costi/2, 5))*(1-std::pow(1-costr/2, 5));
+    Vector3 diffuse = (albedo*IPI)*(Vector3(1,1,1)-specularAlbedo)*(28.0/23.0)*(1-std::pow(1-costi/2, 5))*(1-std::pow(1-costo/2, 5));
     
-    return (diffuse + specularAlbedo*d*g*f/(4*costi*costr))*costi;
+    return (diffuse + specularAlbedo*d*g*f/(4*costi*costo))*costi;
 }
 
 Sample3D FresnelBlend::sample(Vector3 idir, Vector3 odir, Vector3 n, Sampler* sampler) {
@@ -123,7 +135,7 @@ Sample3D FresnelBlend::sample(Vector3 idir, Vector3 odir, Vector3 n, Sampler* sa
     Vector3 wi = ((Vector3() - idir) - wm*((Vector3() - idir).dot(wm)*2));
 
     double d = distribution(wm.dot(n));
-    double pdf = masking(idir.dot(n))*d / (idir.dot(n)*4);
+    double pdf = g1(idir.dot(n))*d / (idir.dot(n)*4);
     return Sample3D(wi, pdf);
 }
 
@@ -131,7 +143,7 @@ double FresnelBlend::getPdf(Vector3 idir, Vector3 odir, Vector3 n) {
 
     Vector3 wm = (idir + odir).norm();
     double d = distribution(wm.dot(n));
-    double pdf = masking(odir.dot(n))*d / (odir.dot(n)*4);
+    double pdf = g1(odir.dot(n))*d / (odir.dot(n)*4);
 
     return 0.5*pdf + 0.5*std::abs(idir.dot(n))*IPI;
 }

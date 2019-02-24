@@ -38,7 +38,8 @@ public:
     Scene();
     void add(Object* object);
     void addLight(Object* object);
-    Object* getLight();
+    Object* getLight(Sampler* sampler);
+    Object* sampleLight(Sampler* sampler);
     Interaction* intersect(Ray ray);
 
     Ray sampleLight();

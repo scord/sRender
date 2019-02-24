@@ -13,5 +13,5 @@ class Camera {
         Camera(Vector3 pos, int w, int h, double fov);
         Vector3 screenToCamera(const Vector2 screenCoord);
         Ray pixelToRay(const Vector2 screenCoord);
-        
+        Ray pixelToRay(const Vector2 screenCoord, Vector2 centre, double focalLength, double focalDistance);
 };

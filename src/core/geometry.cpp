@@ -28,6 +28,12 @@ Vector3 Plane::samplePoint() {
 }
 
 
+Vector2 Shape::uv(Vector3 p) {
+    return Vector2();
+}
+
+
+
 Vector3 Triangle::normal(Vector3 p) {
     return n;
 }

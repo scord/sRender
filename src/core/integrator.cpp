@@ -106,12 +106,13 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampl
 
     Vector3 throughput = Vector3(1,1,1);
     Vector3 colour = Vector3(0,0,0);
-
+    Vector3 bgColour = Vector3(0,0,0);
+    int n_lights = scene->lights.size();
     Interaction* interactionP = nullptr;
     Interaction* nextInteractionP = scene->intersect(ray);;
     if (!nextInteractionP) {
         delete nextInteractionP;
-        return Vector3();
+        return bgColour;
     } 
 
     if (nextInteractionP->material->emission != Vector3()) {
@@ -129,7 +130,11 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampl
 
         nextInteractionP = scene->intersect(interactionP->getIncoming());
         if (!nextInteractionP) {
-            colour += throughput*getDirectIllumination(interactionP, scene, static_cast<Disc*>(scene->getLight()->geometry[0]), sampler);
+            
+            if (n_lights > 0)
+                colour += throughput*getDirectIllumination(interactionP, scene, static_cast<Disc*>(scene->sampleLight(sampler)->geometry[0]), sampler)/n_lights;
+            throughput = throughput * interactionP->getBrdf() / sample.pdf;
+            colour += throughput*bgColour;
             break;
         }
   
@@ -138,11 +143,11 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampl
 
             if (nextInteractionP->material->emission != Vector3()) {
                 // use multiple importance sampling if ray sampled from brdf also hits light
-                
-                colour += throughput*getDirectIlluminationMIS(interactionP, nextInteractionP, scene, static_cast<Disc*>(scene->getLight()->geometry[0]), sampler);
+                if (n_lights > 0)
+                    colour += throughput*getDirectIlluminationMIS(interactionP, nextInteractionP, scene, static_cast<Disc*>(scene->sampleLight(sampler)->geometry[0]), sampler)/n_lights;
                 i = depth;
-            } else {
-                colour += throughput*getDirectIllumination(interactionP, scene, static_cast<Disc*>(scene->getLight()->geometry[0]), sampler);
+            } else if (n_lights > 0) {
+                colour += throughput*getDirectIllumination(interactionP, scene, static_cast<Disc*>(scene->sampleLight(sampler)->geometry[0]), sampler)/n_lights;
             }
             throughput = throughput * interactionP->getBrdf() / sample.pdf;
         } else if (nextInteractionP->material->emission != Vector3()) {

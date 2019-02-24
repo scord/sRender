@@ -18,8 +18,24 @@ void Scene::addLight(Object* object) {
     lights.push_back(object);
 }
 
-Object* Scene::getLight() {
-    return lights[0];
+Object* Scene::getLight(Sampler* sampler) {
+    double r = sampler->getRandomDouble();
+    if (r < 0.5)
+        return lights[0];
+    else
+        return lights[1];
+}
+
+
+Object* Scene::sampleLight(Sampler* sampler) {
+    double totalArea = 0;
+    double n_lights = lights.size();
+    if (n_lights > 0) {
+        int r = int(n_lights*sampler->getRandomDouble());
+        return lights[r];
+    } else {
+        return nullptr;
+    }
 }
 
 Interaction* Scene::intersect(Ray ray) {

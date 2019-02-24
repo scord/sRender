@@ -20,7 +20,7 @@ public:
     Hemisphere hemisphere;
     Vector3 specularAlbedo;
     double distribution(double cost);
-    double masking(double cost);
+    double g1(double cost);
     double g2(double costi, double costr);
     double fresnel(double etai, double etat, double cost);
     Vector3 fresnel(Vector3 r0, double cost);

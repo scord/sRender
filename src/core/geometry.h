@@ -33,6 +33,7 @@ public:
     virtual Vector3 normal(Vector3 p) = 0;
     virtual double Intersect(Ray ray, Vector3 &intersection) = 0;
     virtual void transform(Vector3 position, Vector3 scale) = 0;
+    virtual Vector2 uv(Vector3 p);
 };
 
 
