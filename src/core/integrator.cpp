@@ -44,9 +44,9 @@ Vector3 Integrator::getDirectIllumination(Interaction* interactionP, Scene* scen
     double solidAngle = costl / (lightRayLength*lightRayLength*lightSample.pdf);
     lightPdf = 1/solidAngle;
 
-    interaction.idir = ray.direction;
+    interaction.forceSample(ray.direction, lightPdf);
 
-    return lightInteraction.material->emission*interaction.getBrdf()/lightPdf;   
+    return lightInteraction.material->emission*interaction.brdf*interaction.cost/interaction.pdf;   
 }
 
 Vector3 Integrator::getDirectIlluminationMIS(Interaction* interactionP, Interaction* nextInteractionP, Scene* scene, Disc* light, Sampler* sampler) {    
@@ -78,12 +78,11 @@ Vector3 Integrator::getDirectIlluminationMIS(Interaction* interactionP, Interact
         double cost2 = std::abs(lightN.dot(Vector3()-ray.direction.norm()));
         double lightRayLengthSquared = std::pow((lightInteraction.position - ray.origin).length(),2);
         double solidAngle = cost2*light->area / (lightRayLengthSquared);
-        lightPdf = 1/solidAngle;
+        double lightPdf = 1/solidAngle;
 
-        Interaction directInteraction(interaction.odir, ray.direction, interaction.position, interaction.normal, interaction.material, true);
-
-        lightWeight = powerHeuristicDividedByPdf(lightPdf, directInteraction.getPdf());
-        lightContribution = lightEmission*directInteraction.getBrdf()*lightWeight;
+        Interaction directInteraction(interaction.odir, ray.direction, interaction.position, interaction.normal, interaction.material, true, lightPdf);
+        lightWeight = powerHeuristicDividedByPdf(directInteraction.pdf, interaction.pdf);
+        lightContribution = lightEmission*directInteraction.brdf*directInteraction.cost*lightWeight;
     }
 
     if (nextInteraction.material->emission != Vector3()) {
@@ -91,12 +90,10 @@ Vector3 Integrator::getDirectIlluminationMIS(Interaction* interactionP, Interact
         double cost2 = std::abs(nextInteraction.normal.dot(nextInteraction.odir));
         double lightRayLength = (nextInteraction.position - interaction.position).length();
         double solidAngle = cost2*light->area / (lightRayLength*lightRayLength);
-        double lightPdf2 = 1/solidAngle;
+        double lightPdf = 1/solidAngle;
 
-        brdfPdf = interaction.getPdf();
-        brdfWeight = powerHeuristicDividedByPdf(brdfPdf, lightPdf2);
-
-        brdfContribution = nextInteraction.material->emission*interaction.getBrdf()*brdfWeight;
+        brdfWeight = powerHeuristicDividedByPdf(interaction.pdf, lightPdf);
+        brdfContribution = nextInteraction.material->emission*interaction.brdf*interaction.cost*brdfWeight;
     }
     return lightContribution + brdfContribution;
    
@@ -125,20 +122,23 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampl
     while (i < depth && throughput != Vector3()) {
         interactionP = nextInteractionP;
 
+        
         // sample brdf at interaction
-        Sample3D sample = interactionP->sample(sampler);
+        interactionP->sample(sampler);
+        Interaction interaction = *interactionP;
+        
+        nextInteractionP = scene->intersect(interaction.getIncoming());
 
-        nextInteractionP = scene->intersect(interactionP->getIncoming());
         if (!nextInteractionP) {
             
             if (n_lights > 0)
                 colour += throughput*getDirectIllumination(interactionP, scene, static_cast<Disc*>(scene->sampleLight(sampler)->geometry[0]), sampler)/n_lights;
-            throughput = throughput * interactionP->getBrdf() / sample.pdf;
+            throughput = throughput * interaction.brdf * interaction.cost / interaction.pdf;
             colour += throughput*bgColour;
             break;
         }
   
-        if (sample.pdf != 1) {
+        if (interaction.pdf != 1) {
             // sample lights
 
             if (nextInteractionP->material->emission != Vector3()) {
@@ -149,12 +149,12 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampl
             } else if (n_lights > 0) {
                 colour += throughput*getDirectIllumination(interactionP, scene, static_cast<Disc*>(scene->sampleLight(sampler)->geometry[0]), sampler)/n_lights;
             }
-            throughput = throughput * interactionP->getBrdf() / sample.pdf;
+            throughput = throughput * interaction.brdf * interaction.cost / interaction.pdf;
         } else if (nextInteractionP->material->emission != Vector3()) {
             // don't directly sample lights if pdf is a delta function
 
             // brdf is actually brdf multiplied by cosine factor
-            throughput = throughput * interactionP->getBrdf() / sample.pdf;
+            throughput = throughput * interaction.brdf * interaction.cost / interaction.pdf;
             colour = colour + throughput*nextInteractionP->material->emission;
             i = depth;
         }

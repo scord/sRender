@@ -16,6 +16,6 @@ public:
     
     virtual double getPdf(Vector3 dir, Vector3 odir, Vector3 n);
     virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n);
-    virtual Sample3D sample(Vector3 dir, Vector3 odir, Vector3 n, Sampler* sampler);
+    virtual SampleBSDF sample(Vector3 dir, Vector3 n, Sampler* sampler);
 };
 

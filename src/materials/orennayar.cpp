@@ -45,9 +45,10 @@ Vector3 OrenNayarMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
     return albedo*costi*(a+(b*c*sina*tanb))*IPI;
 }
 
-Sample3D OrenNayarMaterial::sample(Vector3 idir, Vector3 odir, Vector3 n, Sampler* sampler) {
+SampleBSDF OrenNayarMaterial::sample(Vector3 odir, Vector3 n, Sampler* sampler) {
     Sample3D sample = hemisphere.map(sampler->getSample2D());
-    return Sample3D(sample.value.rotate(n), sample.pdf);
+    Vector3 idir = sample.value.rotate(n);
+    return SampleBSDF(sample.value.rotate(n), getBrdf(idir, odir, n), sample.value.z, sample.pdf);
 }
 
 double OrenNayarMaterial::getPdf(Vector3 idir, Vector3 odir, Vector3 n) {

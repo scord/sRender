@@ -20,8 +20,6 @@
 #include "materials/specular.h"
 #include "materials/mirror.h"
 #include "materials/orennayar.h"
-#include "materials/ggx.h"
-#include "materials/blendmaterial.h"
 #include "materials/fresnelblend.h"
 #define PI 3.1415926536
 
@@ -29,7 +27,7 @@ std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::v
 
 int main() {
 
-	Camera cam(Vector3(0,0,3), 640, 640, PI/6);
+	Camera cam(Vector3(0,0,3), 320, 320, PI/6);
 
 	Scene scene;
 
@@ -56,7 +54,6 @@ int main() {
 	std::vector<Shape*> greenRoomGeometry;
 	greenRoomGeometry.push_back(new Quad(Vector3(-1,0,0), Vector3(1,0,0), Vector2(1.0,1), Vector3(0,0,-1)));
 	
-	GGXMaterial* ggx = new GGXMaterial(Vector3(1.0,1.0,1.0), Vector3(0.9,0.5,0.5), 0.2);
 	OrenNayarMaterial* on = new OrenNayarMaterial(Vector3(0.9, 0.1, 0.1), 0.2);
 
 

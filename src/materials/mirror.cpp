@@ -10,10 +10,10 @@ Vector3 MirrorMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
     return albedo;
 }
 
-Sample3D MirrorMaterial::sample(Vector3 dir, Vector3 odir, Vector3 n, Sampler* sampler) {
+SampleBSDF MirrorMaterial::sample(Vector3 dir,  Vector3 n, Sampler* sampler) {
     dir = Vector3() - dir;
     Vector3 reflectedDir = (dir - n*dir.dot(n)*2).norm();
-    return Sample3D(reflectedDir, 1);
+    return SampleBSDF(reflectedDir, albedo, 1, 1);
 }
 
 double MirrorMaterial::getPdf(Vector3 dir, Vector3 odir, Vector3 n) {

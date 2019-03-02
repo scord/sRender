@@ -14,11 +14,10 @@ Vector3 DiffuseMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
     return albedo*std::abs(odir.dot(n))*IPI;
 }
 
-Sample3D DiffuseMaterial::sample(Vector3 dir, Vector3 odir, Vector3 n, Sampler* sampler) {
+SampleBSDF DiffuseMaterial::sample(Vector3 odir,  Vector3 n, Sampler* sampler) {
     Sample3D sample = hemisphere.map(sampler->getSample2D());
-   // Vector3 test = sample.value.rotationMatrix()*n ;
-
-    return Sample3D(sample.value.rotate(n), sample.pdf);
+    Vector3 idir = sample.value.rotate(n);
+    return SampleBSDF(sample.value.rotate(n), getBrdf(idir, odir, n), sample.value.z, sample.pdf);
 }
 
 double DiffuseMaterial::getPdf(Vector3 dir, Vector3 odir, Vector3 n) {

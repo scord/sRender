@@ -3,42 +3,32 @@
 
 Interaction::Interaction(Vector3 direction, Vector3 pos, Vector3 n, Material* mat, bool backward) 
     : position(pos), normal(n), material(mat), backward(backward) {
-    cost = direction.dot(n);
-    if (backward) {
-        odir = direction;
-    } else {
-        idir = direction;
-    }
+    
+    odir = direction;
+
 }
 
-Interaction::Interaction(Vector3 odir, Vector3 idir, Vector3 pos, Vector3 n, Material* mat,  bool backward)
-    : odir(odir), idir(idir), position(pos), normal(n), material(mat), backward(backward) {
-    cost = odir.dot(n);
+Interaction::Interaction(Vector3 odir, Vector3 idir, Vector3 pos, Vector3 n, Material* mat,  bool backward, double pdf)
+    : odir(odir), idir(idir), position(pos), normal(n), material(mat), backward(backward), pdf(pdf) {
+    cost = idir.dot(n);
+    brdf = getBrdf();
 }
 
-Sample3D Interaction::sample(Sampler* sampler) {
-    if (backward) {
-        Sample3D sample = material->sample(odir, idir, normal, sampler);
-        idir = sample.value;
-        return sample;
-    } else {
-        Sample3D sample = material->sample(idir, odir, normal, sampler);
-        odir = sample.value;
-        return sample;
-    }
+void Interaction::forceSample(Vector3 idir, double pdf) {
+    this->idir = idir;
+    cost = idir.dot(normal);
+    this->pdf = pdf;
+    brdf = getBrdf();
 }
 
-Sample3D Interaction::sample(Sampler* sampler, Vector3& reflectance) {
-    if (backward) {
-        Sample3D sample = material->sample(odir, idir, normal, reflectance, sampler);
-        idir = sample.value;
-        return sample;
-    } else {
-        Sample3D sample = material->sample(idir, odir, normal, reflectance, sampler);
-        odir = sample.value;
-        return sample;
-    }
+void Interaction::sample(Sampler* sampler) {
+    SampleBSDF sample = material->sample(odir, normal, sampler);
+    cost = sample.cost;
+    brdf = sample.bsdf;
+    pdf = sample.pdf;
+    idir = sample.value;
 }
+
 
 
 Ray Interaction::getOutgoing() {
@@ -50,27 +40,15 @@ Ray Interaction::getIncoming() {
 }
 
 double Interaction::getPdf() {
-    if (backward) {
-        return material->getPdf(idir, odir, normal);
-    }  else {
-        return material->getPdf(odir, idir, normal);
-    }
+    return material->getPdf(idir, odir, normal);
 }
 
 Vector3 Interaction::getBrdf() {
-    if (backward) {
-        return material->getBrdf(idir, odir, normal);
-    } else {
-        return material->getBrdf(odir, idir, normal);
-    }
+    return material->getBrdf(idir, odir, normal);
 }
 
 Vector3 Interaction::getReflectance() {
-    if (backward) {
-        return material->reflectance(idir, odir, normal);
-    } else {
-        return material->reflectance(odir, idir, normal);
-    }
+    return material->reflectance(idir, odir, normal);
 }
 
 
