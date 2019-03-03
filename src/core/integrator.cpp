@@ -131,8 +131,8 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampl
 
         if (!nextInteractionP) {
             
-            if (n_lights > 0)
-                colour += throughput*getDirectIllumination(interactionP, scene, static_cast<Disc*>(scene->sampleLight(sampler)->geometry[0]), sampler)/n_lights;
+            for (auto l : scene->lights)
+                colour += throughput*getDirectIllumination(interactionP, scene, static_cast<Disc*>(l->geometry[0]), sampler)/n_lights;
             throughput = throughput * interaction.brdf * interaction.cost / interaction.pdf;
             colour += throughput*bgColour;
             break;
@@ -143,22 +143,24 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampl
 
             if (nextInteractionP->material->emission != Vector3()) {
                 // use multiple importance sampling if ray sampled from brdf also hits light
-                if (n_lights > 0)
-                    colour += throughput*getDirectIlluminationMIS(interactionP, nextInteractionP, scene, static_cast<Disc*>(scene->sampleLight(sampler)->geometry[0]), sampler)/n_lights;
+               for (auto l : scene->lights)
+                colour += throughput*getDirectIlluminationMIS(interactionP, nextInteractionP, scene, static_cast<Disc*>(l->geometry[0]), sampler)/n_lights;
                 i = depth;
-            } else if (n_lights > 0) {
-                colour += throughput*getDirectIllumination(interactionP, scene, static_cast<Disc*>(scene->sampleLight(sampler)->geometry[0]), sampler)/n_lights;
+            } else {
+                for (auto l : scene->lights)
+                    colour += throughput*getDirectIllumination(interactionP, scene, static_cast<Disc*>(l->geometry[0]), sampler)/n_lights;
             }
             throughput = throughput * interaction.brdf * interaction.cost / interaction.pdf;
-        } else if (nextInteractionP->material->emission != Vector3()) {
+        } else {
             // don't directly sample lights if pdf is a delta function
-
-            // brdf is actually brdf multiplied by cosine factor
             throughput = throughput * interaction.brdf * interaction.cost / interaction.pdf;
-            colour = colour + throughput*nextInteractionP->material->emission;
-            i = depth;
-        }
 
+            if (nextInteractionP->material->emission != Vector3()) {
+                colour += throughput*nextInteractionP->material->emission;
+                i = depth;
+            }
+        }
+ 
         i++; 
         delete interactionP;  
     }

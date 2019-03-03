@@ -1,13 +1,10 @@
 #include "core/smath.h"
 #include "core/camera.h"
 #include <stdio.h>
-
 #include <algorithm>
 #include <vector>
 #include "core/geometry.h"
 #include "core/integrator.h"
-
-
 #include <thread>
 #include <future>
 #include <chrono>
@@ -21,13 +18,15 @@
 #include "materials/mirror.h"
 #include "materials/orennayar.h"
 #include "materials/fresnelblend.h"
+#include "materials/ggxmaterial.h"
+
 #define PI 3.1415926536
 
 std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth);
 
 int main() {
 
-	Camera cam(Vector3(0,0,3), 320, 320, PI/6);
+	Camera cam(Vector3(0,0,3), 640, 640, PI/6);
 
 	Scene scene;
 
@@ -75,7 +74,8 @@ int main() {
 //	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.2, -0.1, -0.5), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
 	
 	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(-0.3, -0.6, -0.35), 0.4)}, Vector3(0,0,0), 1, new FresnelBlend(Vector3(0.8,0.3,0.1), Vector3(0.4,0.4,0.4), 0.6)));
-	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.4, -0.6, 0.5), 0.4)}, Vector3(0,0,0), 1, new FresnelBlend(Vector3(0.3,0.8,0.1), Vector3(0.4,0.4,0.4), 0.3)));
+	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.4, -0.6, 0.2), 0.4)}, Vector3(0,0,0), 1, new FresnelBlend(Vector3(0.2,0.1,0.5), Vector3(0.4,0.4,0.4), 0.4)));
+	//scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.4, -0.6, 0.2), 0.4)}, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.2,0.1,0.5), Vector3(0.4,0.4,0.4), 0.1)));
 
 	Shape* areaLight = new Disc(Vector3(-0.5,0.999,0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
 	Shape* areaLight2 = new Disc(Vector3(0.5,0.999,0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
@@ -105,7 +105,7 @@ int main() {
         }
     }
 
-	int samplesPerPixel = 16;
+	int samplesPerPixel = 64;
 	
 	auto start = std::chrono::high_resolution_clock::now();
 	
@@ -132,7 +132,7 @@ int main() {
 	std::vector<std::future<std::vector<std::vector<Vector3>>>> resultTiles;
 
 	for (int t = 0; t < tileCount; t++) {
-		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 6));
+		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 5));
 	}
 
 	int k = 0;

@@ -26,19 +26,31 @@ Vector3 Sampler::quadToHemisphere(double u1, double u2) {
 
 
 Sample2D Sampler::getStratifiedSample() {
-
+    
     i = i % (gridSize2);
     int x = int(i/gridSize);
     int  y = i % gridSize;
     i++;
-
-    return Sample2D(Vector2(x/gridSize + dis(gen)/gridSize, y/gridSize + dis(gen)/gridSize), 1);
+    
+    return Sample2D(Vector2(x/(double)gridSize + dis(gen)/(double)gridSize, y/(double)gridSize + dis(gen)/(double)gridSize), 1);
 }
 
 Sample2D Sampler::getSample2D() {
-    return Sample2D(Vector2(dis(gen), dis(gen)), 1);
+    if (recycledDouble == 0) {
+        return Sample2D(Vector2(dis(gen), dis(gen)), 1);
+    } else {
+        double r = recycledDouble;
+        recycledDouble = 0;
+        return Sample2D(Vector2(r, dis(gen)), 1);
+    }
 }
 
 double Sampler::getRandomDouble() {
-    return dis(gen);
+    if (recycledDouble == 0) {
+        return dis(gen);
+    } else {
+        double r = recycledDouble;
+        recycledDouble = 0;
+        return r;
+    }
 }

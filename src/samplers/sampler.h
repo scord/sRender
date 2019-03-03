@@ -18,6 +18,7 @@ public:
     int gridSize;
     int gridSize2;
     int i;
+    double recycledDouble = 0;
     Vector3 quadToHemisphere(double u1, double u2);
     int stratifiedSampleNumber;
     int randomSampleNumber;

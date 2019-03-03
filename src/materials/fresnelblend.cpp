@@ -99,26 +99,7 @@ Vector3 FresnelBlend::getBrdf(double nidir, double nodir, double mdir, double d)
     return diffuse + specularAlbedo*d*g*f/2.0;
 }
 
-SampleBSDF FresnelBlend::sample(Vector3 odir, Vector3 n, Sampler* sampler) {
-
-    double diffuseSwitch = sampler->getRandomDouble();
-
-    if (diffuseSwitch > 0.5) {
-        Sample3D sample = hemisphere.map(sampler->getSample2D());
-        double costi = sample.value.z;
-        Vector3 idir = sample.value.rotate(n);
-        
-        if (costi < 0) {
-            return SampleBSDF(idir, Vector3(), sample.value.z, sample.pdf);
-        }
-
-        Vector3 wm = (idir+odir).norm();
-        double costm = n.dot(wm);
-        double d = distribution(costm);
-   
-        return SampleBSDF(idir, getBrdf(costi, n.dot(odir), odir.dot(wm), d), costi, sample.pdf);
-    }
-
+SampleBSDF FresnelBlend::sampleSpecular(Vector3 odir, Vector3 n, Sampler* sampler) {
     Vector3 dirPerp = (odir - n*odir.dot(n));
     Vector3 t1 = dirPerp.norm().cross(n).norm();
     Vector3 stretchedDir = (dirPerp*alpha + n*odir.dot(n)).norm();
@@ -153,13 +134,42 @@ SampleBSDF FresnelBlend::sample(Vector3 odir, Vector3 n, Sampler* sampler) {
 
     double dirdotwm = odir.dot(wm);
     Vector3 idir = wm*dirdotwm*2 - odir;
-    double costm = n.dot(wm);
     double costi = n.dot(idir);
     double costo = n.dot(odir);
+    double costm = n.dot(wm);
     double d = distribution(costm);
-    double pdf = g1DividedBy2Cos(costo)*d / 2.0;
-    return SampleBSDF(idir, getBrdf(costi, costo, dirdotwm, d), costi, pdf);
+    if (costi < 0)
+        return SampleBSDF(idir, Vector3(), 0, getPdf(idir, odir, n));
+
+    return SampleBSDF(idir, getBrdf(costi, costo, dirdotwm, d), costi, getPdf(idir, odir, n));
 }
+
+SampleBSDF FresnelBlend::sampleDiffuse(Vector3 odir, Vector3 n, Sampler* sampler) {
+    Sample3D sample = hemisphere.map(sampler->getSample2D());
+    double costi = sample.value.z;
+    Vector3 idir = sample.value.rotate(n);
+
+    Vector3 wm = (idir+odir).norm();
+    double costm = n.dot(wm);
+    double d = distribution(costm);
+
+    return SampleBSDF(idir, getBrdf(costi, n.dot(odir), odir.dot(wm), d), costi, getPdf(idir, odir, n));
+}
+
+SampleBSDF FresnelBlend::sample(Vector3 odir, Vector3 n, Sampler* sampler) {
+    
+    double diffuseSwitch = sampler->getRandomDouble();
+
+    if (diffuseSwitch > 0.5) {
+        sampler->recycledDouble = (diffuseSwitch - 0.5) / 0.5;
+        return sampleDiffuse(odir, n, sampler);
+    } else {
+        sampler->recycledDouble = diffuseSwitch/0.5;
+        return sampleSpecular(odir, n, sampler);
+    }
+}
+
+
 
 double FresnelBlend::getPdf(Vector3 idir, Vector3 odir, Vector3 n) {
 
