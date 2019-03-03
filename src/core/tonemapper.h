@@ -22,7 +22,7 @@ public:
 
 
                 double lum = ToneMapper::luminance(radiance[i][j]);
-                double scaledLuminance = lum*0.85/averageLuminance;
+                double scaledLuminance = lum*1.0/averageLuminance;
 
                 double finalLuminance = scaledLuminance/(1+scaledLuminance);
 

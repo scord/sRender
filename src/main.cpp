@@ -56,9 +56,9 @@ int main() {
 	OrenNayarMaterial* on = new OrenNayarMaterial(Vector3(0.9, 0.1, 0.1), 0.2);
 
 
-	scene.add(new Object(redRoomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.5,0.1,0.1), 0.5)));
-	scene.add(new Object(greenRoomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.1,0.5,0.1), 0.5)));
-	scene.add(new Object(roomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.4,0.4,0.4), 0.5)));
+	scene.add(new Object(redRoomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.5,0.1,0.1), 0.15)));
+	scene.add(new Object(greenRoomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.1,0.5,0.1), 0.15)));
+	scene.add(new Object(roomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.4,0.4,0.4), 0.15)));
 	// BOX
 	//scene.push_back(new Quad(Vector3(-0.5,0.1,-0.5), Vector3(0,1,0), Vector3(1,1,1), new DiffuseMaterial(), Vector2(0.25,0.25), Vector3(0,0,-1)));
 	//scene.push_back(new Quad(Vector3(-0.75,-0.45,-0.5), Vector3(-1,0,0), Vector3(1,1,1), new DiffuseMaterial(), Vector2(0.25,0.55), Vector3(0,1,0)));
@@ -105,7 +105,7 @@ int main() {
         }
     }
 
-	int samplesPerPixel = 64;
+	int samplesPerPixel = 256;
 	
 	auto start = std::chrono::high_resolution_clock::now();
 	
@@ -132,7 +132,7 @@ int main() {
 	std::vector<std::future<std::vector<std::vector<Vector3>>>> resultTiles;
 
 	for (int t = 0; t < tileCount; t++) {
-		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 5));
+		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 3));
 	}
 
 	int k = 0;
