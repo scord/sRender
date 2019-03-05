@@ -143,18 +143,22 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampl
         if (interaction.pdf != 1) {
             // sample lights
             double brdfWeight = 0;
+            double totalWeight = 0;
             if (nextInteractionP->material->emission != Vector3()) {
                 
                 // use multiple importance sampling if ray sampled from brdf also hits light
-               for (auto l : scene->lights)
-                colour += throughput*getDirectIlluminationMIS(interactionP, nextInteractionP, scene, static_cast<Disc*>(l->geometry[0]), sampler, brdfWeight)/n_lights;
-            
+                for (auto l : scene->lights) {
+                    colour += throughput*getDirectIlluminationMIS(interactionP, nextInteractionP, scene, static_cast<Disc*>(l->geometry[0]), sampler, brdfWeight)/n_lights;
+                    totalWeight += brdfWeight;
+                }
                 i = depth;
             } else {
-                for (auto l : scene->lights)
+                for (auto l : scene->lights) {
                     colour += throughput*getDirectIlluminationMIS(interactionP, nextInteractionP,scene, static_cast<Disc*>(l->geometry[0]), sampler, brdfWeight)/n_lights;
+                    totalWeight += brdfWeight;
+                }
             }
-            throughput = throughput * interaction.brdf * interaction.cost * brdfWeight;
+            throughput = throughput * interaction.brdf * interaction.cost * totalWeight/n_lights;
         } else {
             // don't directly sample lights if pdf is a delta function
             throughput = throughput * interaction.brdf * interaction.cost / interaction.pdf;
