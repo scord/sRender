@@ -14,6 +14,8 @@ public:
     FresnelBlend(Vector3 albedo, Vector3 emission);
     FresnelBlend(Vector3 albedo, double roughness);
     FresnelBlend(Vector3 albedo, Vector3 specularAlbedo, double roughness);
+    FresnelBlend(Image& texture, Vector3 specularAlbedo, double roughness);
+
     double roughness;
     double alpha;
     double alpha2;
@@ -28,11 +30,14 @@ public:
     Vector3 fresnel(Vector3 r0, double cost);
     virtual double getPdf(Vector3 dir, Vector3 odir, Vector3 n);
     virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n);
+    virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector3 p);
+    Image texture;
     virtual SampleBSDF sample(Vector3 dir, Vector3 n, Sampler* sampler);
     SampleBSDF sampleDiffuse(Vector3 dir, Vector3 n, Sampler* sampler);
     SampleBSDF sampleSpecular(Vector3 dir, Vector3 n, Sampler* sampler);
 
     Vector3 getBrdf(double nidir, double nodir, double mdir, double d);
+    virtual Vector3 getAlbedo(Vector3 p);
 
 };
 

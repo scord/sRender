@@ -15,6 +15,7 @@ public:
     Material* material;
     Object() {};
     Object(std::vector<Shape*> geometry, Vector3 pos, double scale, Material* material);
+
     BoundingBox aabb;
     BoundingBox calculateBoundingBox();
     virtual double intersect(Ray ray, Shape* &intersectedGeometry);

@@ -28,11 +28,6 @@ Vector3 Plane::samplePoint() {
 }
 
 
-Vector2 Shape::uv(Vector3 p) {
-    return Vector2();
-}
-
-
 
 Vector3 Triangle::normal(Vector3 p) {
     return n;
@@ -258,9 +253,26 @@ Sample3D Disc::sample(double u1, double u2) {
 }
 
 
+
 Quad::Quad(Vector3 p0, Vector3 n, Vector2 size, Vector3 up) : Plane(p0, n), size(size) {
     this->up = up;
     left = up.cross(n);
+}
+
+Vector2 planarUVMapping(Vector3 pos, Vector3 p0, Vector3 left, Vector3 up, Vector2 size) {
+    Vector3 d = pos - p0;
+    double x = (d.dot(left) + size.x)/(size.x*2);
+    double y = (d.dot(up) + size.y)/(size.y*2);
+    return Vector2(x, y);
+}
+
+std::function<Vector2(Vector3)> Shape::defaultUVMapping() {
+    return [](Vector3 v) {return Vector2(0,0);};
+}
+
+std::function<Vector2(Vector3)> Quad::defaultUVMapping() {
+    using namespace std::placeholders; 
+    return std::bind(planarUVMapping, _1, p0, left, up, size);
 }
 
 BoundingBox Quad::calculateBoundingBox() {

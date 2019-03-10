@@ -78,8 +78,10 @@ Interaction* Scene::intersect(Ray ray) {
 Object::Object(std::vector<Shape*> geometry, Vector3 pos, double scale, Material* material) : geometry(geometry), transform(Transform(pos, Vector3(scale, scale, scale), Vector3())), aabb(calculateBoundingBox()), material(material) {
     for (int i = 0; i < geometry.size(); i++) {
         geometry[i]->transform(pos, Vector3(scale, scale, scale));
-    }
-} 
+    }    
+
+    material->bind(geometry[0]);
+}
 
 KDTreeObject::KDTreeObject(std::vector<Shape*> geometry, Vector3 pos, double scale, Material* material) : 
     Object(geometry, pos, scale, material) { 

@@ -12,6 +12,7 @@ class Interaction {
 public:
     Interaction();
     Interaction(Vector3 direction, Vector3 pos, Vector3 n, Material* material, bool backward);
+
     Interaction(Vector3 odir, Vector3 idir, Vector3 pos, Vector3 n, Material* material, bool backward, double pdf);
 
     Ray getOutgoing();

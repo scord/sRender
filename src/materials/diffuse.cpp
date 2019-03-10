@@ -10,6 +10,7 @@ DiffuseMaterial::DiffuseMaterial(Vector3 albedo, Vector3 emission) : hemisphere(
     this->emission = emission;
 }
 
+
 Vector3 DiffuseMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
     return albedo*std::abs(odir.dot(n))*IPI;
 }

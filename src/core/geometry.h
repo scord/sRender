@@ -3,7 +3,7 @@
 #include "../core/smath.h"
 #include <vector>
 #include "sample.h"
-
+#include <functional>
 
 class BoundingBox {
 public:
@@ -33,7 +33,7 @@ public:
     virtual Vector3 normal(Vector3 p) = 0;
     virtual double Intersect(Ray ray, Vector3 &intersection) = 0;
     virtual void transform(Vector3 position, Vector3 scale) = 0;
-    virtual Vector2 uv(Vector3 p);
+    virtual std::function<Vector2(Vector3)> defaultUVMapping();
 };
 
 
@@ -87,6 +87,7 @@ public:
     virtual Vector3 samplePoint();
     virtual double Intersect(Ray ray, Vector3 &intersection);
     virtual void transform(Vector3 position, Vector3 scale);
+    virtual std::function<Vector2(Vector3)> defaultUVMapping();
 };
 
 class Sphere : public Shape {
@@ -112,3 +113,4 @@ public:
     virtual void transform(Vector3 position, Vector3 scale);
 };
 
+Vector2 planarUVMapping(Vector3 pos, Vector3 p0, Vector3 left, Vector3 up, Vector2 size);

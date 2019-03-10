@@ -19,14 +19,15 @@
 #include "materials/orennayar.h"
 #include "materials/fresnelblend.h"
 #include "materials/ggxmaterial.h"
-
+#include "io/ppmreader.h"
+#include "core/image.h"
 #define PI 3.1415926536
 
 std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth);
 
 int main() {
 
-	Camera cam(Vector3(0,0,3), 640, 640, PI/6);
+	Camera cam(Vector3(0,0,3), 1280, 1280, PI/6);
 
 	Scene scene;
 
@@ -39,26 +40,26 @@ int main() {
 	//scene.add(bunny);
 
 	// ROOM
-	std::vector<Shape*> roomGeometry;
 
-
-	roomGeometry.push_back(new Quad(Vector3(0,1,0), Vector3(0,-1,0), Vector2(1.0,1.0), Vector3(0,0,-1)));
-	roomGeometry.push_back(new Quad(Vector3(0,-1,0), Vector3(0,1,0), Vector2(1.0,1.0), Vector3(0,0,-1)));
-	roomGeometry.push_back(new Quad(Vector3(0,0,-1), Vector3(0,0,1), Vector2(1.0,1.0), Vector3(0,1,0)));
-	roomGeometry.push_back(new Quad(Vector3(0,0,1), Vector3(0,0,-1), Vector2(1.0,1.0), Vector3(0,1,0)));
-	
-	std::vector<Shape*> redRoomGeometry;
-	redRoomGeometry.push_back(new Quad(Vector3(1,0,0), Vector3(-1,0,0), Vector2(1.0,1), Vector3(0,0,-1)));
-
-	std::vector<Shape*> greenRoomGeometry;
-	greenRoomGeometry.push_back(new Quad(Vector3(-1,0,0), Vector3(1,0,0), Vector2(1.0,1), Vector3(0,0,-1)));
+	std::vector<Shape*> ceilingGeometry({new Quad(Vector3(0,1,0), Vector3(0,-1,0), Vector2(1.0,1.0), Vector3(0,0,-1))});
+	std::vector<Shape*> floorGeometry({new Quad(Vector3(0,-1,0), Vector3(0,1,0), Vector2(1.0,1.0), Vector3(0,0,-1))});
+	std::vector<Shape*> backWallGeometry({new Quad(Vector3(0,0,-1), Vector3(0,0,1), Vector2(1.0,1.0), Vector3(0,1,0))});
+	std::vector<Shape*> frontWallGeometry({new Quad(Vector3(0,0,1), Vector3(0,0,-1), Vector2(1.0,1.0), Vector3(0,1,0))});
+	std::vector<Shape*> rightWallGeometry({new Quad(Vector3(1,0,0), Vector3(-1,0,0), Vector2(1.0,1), Vector3(0,0,-1))});
+	std::vector<Shape*> leftWallGeometry({new Quad(Vector3(-1,0,0), Vector3(1,0,0), Vector2(1.0,1), Vector3(0,0,-1))});
 	
 	OrenNayarMaterial* on = new OrenNayarMaterial(Vector3(0.9, 0.1, 0.1), 0.2);
 
+	Image woodImage = PPMReader("/Users/samcordingley/test.ppm").load();
+	Image concreteImage = PPMReader("/Users/samcordingley/dev/sRender/concrete.ppm").load();
 
-	scene.add(new Object(redRoomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.5,0.1,0.1), 0.15)));
-	scene.add(new Object(greenRoomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.1,0.5,0.1), 0.15)));
-	scene.add(new Object(roomGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(0.4,0.4,0.4), 0.15)));
+	scene.add(new Object(floorGeometry, Vector3(0,0,0), 1, new FresnelBlend(woodImage, Vector3(0.5,0.5,0.5), 0.3)));
+	scene.add(new Object(leftWallGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(concreteImage)));
+	scene.add(new Object(rightWallGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(concreteImage)));
+	scene.add(new Object(ceilingGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(concreteImage)));
+	scene.add(new Object(backWallGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(concreteImage)));
+	scene.add(new Object(frontWallGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(concreteImage)));
+
 	// BOX
 	//scene.push_back(new Quad(Vector3(-0.5,0.1,-0.5), Vector3(0,1,0), Vector3(1,1,1), new DiffuseMaterial(), Vector2(0.25,0.25), Vector3(0,0,-1)));
 	//scene.push_back(new Quad(Vector3(-0.75,-0.45,-0.5), Vector3(-1,0,0), Vector3(1,1,1), new DiffuseMaterial(), Vector2(0.25,0.55), Vector3(0,1,0)));
@@ -73,14 +74,16 @@ int main() {
 	//scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.5, 0.3, 0.2), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
 //	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.2, -0.1, -0.5), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
 	
-	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(-0.3, -0.6, -0.35), 0.4)}, Vector3(0,0,0), 1, new FresnelBlend(Vector3(0.8,0.3,0.1), Vector3(0.4,0.4,0.4), 0.6)));
-	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.4, -0.6, 0.2), 0.4)}, Vector3(0,0,0), 1, new FresnelBlend(Vector3(0.2,0.1,0.5), Vector3(0.4,0.4,0.4), 0.4)));
+	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(-0.3, -0.6, -0.35), 0.4)}, Vector3(0,0,0), 1, new FresnelBlend(Vector3(0.05,0.1,0.6), Vector3(0.4,0.4,0.4), 0.3)));
+	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.4, -0.6, 0.2), 0.4)}, Vector3(0,0,0), 1, new FresnelBlend(Vector3(0.2,0.1,0.5), Vector3(0.4,0.4,0.4), 0.5)));
 	//scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.4, -0.6, 0.2), 0.4)}, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.2,0.1,0.5), Vector3(0.4,0.4,0.4), 0.1)));
 
-	Shape* areaLight = new Disc(Vector3(-0.5,0.999,0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
+	Shape* areaLight = new Disc(Vector3(0.0,0.999,0.0), Vector3(0,-1,0), Vector2(0.5,0.5));
+	//Shape* areaLight = new Disc(Vector3(-0.5,0.999,0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
 	Shape* areaLight2 = new Disc(Vector3(0.5,0.999,0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
-	Shape* areaLight3 = new Disc(Vector3(0.6,-0.7,-0.999), Vector3(0,0,1), Vector2(0.25,0.25));
+	//Shape* areaLight3 = new Disc(Vector3(0.6,-0.7,-0.999), Vector3(0,0,1), Vector2(0.25,0.25));
 	Shape* areaLight4 = new Disc(Vector3(0.5,0.999,-0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
+	Shape* areaLight3 = new Disc(Vector3(-0.5,0.999,-0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
 
 	std::vector<Shape*> lightGeometry;
 	lightGeometry.push_back(areaLight);
@@ -91,10 +94,12 @@ int main() {
 	std::vector<Shape*> lightGeometry4;
 	lightGeometry4.push_back(areaLight4);
 	
+	scene.addLight(new Object(lightGeometry, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(1000,900,800))));
+
 	//scene.addLight(new Object(lightGeometry, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(900,500,500))));
 	//scene.addLight(new Object(lightGeometry2, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(1000,900,80))));
-	scene.addLight(new Object(lightGeometry3, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(100,900,800))));
-	//scene.addLight(new Object(lightGeometry4, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(500,900,500))));
+//	scene.addLight(new Object(lightGeometry3, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(100,900,800))));
+//	scene.addLight(new Object(lightGeometry4, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(500,900,500))));
 
 	std::vector<std::vector<Vector3>> image;
 

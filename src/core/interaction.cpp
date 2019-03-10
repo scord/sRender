@@ -24,12 +24,10 @@ void Interaction::forceSample(Vector3 idir, double pdf) {
 void Interaction::sample(Sampler* sampler) {
     SampleBSDF sample = material->sample(odir, normal, sampler);
     cost = sample.cost;
-    brdf = sample.bsdf;
     pdf = sample.pdf;
     idir = sample.value;
+    brdf = getBrdf();
 }
-
-
 
 Ray Interaction::getOutgoing() {
     return Ray(position, odir);
@@ -44,7 +42,7 @@ double Interaction::getPdf() {
 }
 
 Vector3 Interaction::getBrdf() {
-    return material->getBrdf(idir, odir, normal);
+    return material->getBrdf(idir, odir, normal, position);
 }
 
 Vector3 Interaction::getReflectance() {
