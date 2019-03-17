@@ -2,33 +2,26 @@
 #include "../core/smath.h"
 #include <iostream>
 #include <assert.h>
-GGXMaterial::GGXMaterial() : hemisphere(Hemisphere(Vector3(), 1)){
+GGXMaterial::GGXMaterial() : Material(), hemisphere(Hemisphere(Vector3(), 1)) {
     roughness = 0.5;
     alpha = roughness * roughness;
     alpha2 = alpha*alpha;
 }
-GGXMaterial::GGXMaterial(Vector3 albedo) : hemisphere(Hemisphere(Vector3(), 1)){
-    this->albedo = albedo;
+GGXMaterial::GGXMaterial(Vector3 albedo) : Material(albedo, Vector3()), hemisphere(Hemisphere(Vector3(), 1)){
     this->roughness = 1.0;
     alpha = roughness * roughness;
     alpha2 = alpha*alpha;
 }
 
-GGXMaterial::GGXMaterial(Vector3 albedo, Vector3 emission) : hemisphere(Hemisphere(Vector3(), 1)){
-    this->albedo = albedo;
-    this->emission = emission;
+GGXMaterial::GGXMaterial(Vector3 albedo, Vector3 emission) : Material(albedo, Vector3()), hemisphere(Hemisphere(Vector3(), 1)){
 }
 
-GGXMaterial::GGXMaterial(Vector3 albedo, double roughness) : roughness(roughness), hemisphere(Hemisphere(Vector3(), 1)) {
-    this->albedo = albedo;
-    this->specularAlbedo = albedo;
+GGXMaterial::GGXMaterial(Vector3 albedo, double roughness) : Material(albedo, Vector3()), roughness(roughness), hemisphere(Hemisphere(Vector3(), 1)) {
     alpha = roughness * roughness;
     alpha2 = alpha*alpha;
 }
 
-GGXMaterial::GGXMaterial(Vector3 albedo, Vector3 specularAlbedo, double roughness) : roughness(roughness), hemisphere(Hemisphere(Vector3(), 1)) {
-    this->albedo = albedo;
-    this->specularAlbedo = specularAlbedo;
+GGXMaterial::GGXMaterial(Vector3 albedo, Vector3 specularAlbedo, double roughness) : Material(albedo, Vector3()), roughness(roughness), hemisphere(Hemisphere(Vector3(), 1)) {
     alpha = roughness * roughness;
     alpha2 = alpha*alpha;
 }
@@ -56,7 +49,7 @@ double GGXMaterial::g2DividedBy2CosiCoso(double costi, double costo) {
     return 1.0/(costo*std::sqrt(alpha2+(1-alpha2)*costi*costi) + costi*std::sqrt(alpha2+(1-alpha2)*costo*costo) );
 }
 
-Vector3 GGXMaterial::getBrdf(Vector3 idir, Vector3 odir, Vector3 n) {
+Vector3 GGXMaterial::getBrdf(Vector3 idir, Vector3 odir, Vector3 n, Vector2 uv) {
     double costi = n.dot(idir);
     if (costi < 0) {
         return Vector3();
@@ -71,11 +64,10 @@ Vector3 GGXMaterial::getBrdf(Vector3 idir, Vector3 odir, Vector3 n) {
     double d = distribution(cost);
 
     double g = g2(costi, costo);
-    Vector3 f = fresnel(specularAlbedo, idir.dot(wm));
+    Vector3 f = fresnel(albedo.value(uv), idir.dot(wm));
 
-    Vector3 diffuse = (albedo*IPI)*(Vector3(1,1,1)-specularAlbedo)*(28.0/23.0)*(1-std::pow(1-costi/2, 5))*(1-std::pow(1-costo/2, 5));
     
-    return (diffuse + specularAlbedo*d*g*f/(4*costi*costo));
+    return albedo.value(uv)*d*g*f/(4*costi*costo);
 }
 
 double GGXMaterial::fresnel(double etai, double etat, double cost) {
@@ -87,15 +79,6 @@ Vector3 GGXMaterial::fresnel(Vector3 r0, double cost) {
     return r0 + (Vector3(1,1,1) - r0)*std::pow(1-cost, 5);
 }
 
-
-Vector3 GGXMaterial::getBrdf(double nidir, double nodir, double mdir, double d) {
-    if (nidir < 0)
-        return Vector3();
-    
-    Vector3 f = fresnel(specularAlbedo, mdir);
-    double g = g2DividedBy2CosiCoso(nidir, nodir);
-    return specularAlbedo*d*g*f/2.0;
-}
 
 SampleBSDF GGXMaterial::sample(Vector3 odir, Vector3 n, Sampler* sampler) {
     Vector3 dirPerp = (odir - n*odir.dot(n));
@@ -139,7 +122,7 @@ SampleBSDF GGXMaterial::sample(Vector3 odir, Vector3 n, Sampler* sampler) {
     if (costi < 0)
         return SampleBSDF(idir, Vector3(), 0, getPdf(idir, odir, n));
 
-    return SampleBSDF(idir, getBrdf(costi, costo, dirdotwm, d), costi, getPdf(idir, odir, n));
+    return SampleBSDF(idir, Vector3(), costi, getPdf(idir, odir, n));
 }
 
 double GGXMaterial::getPdf(Vector3 idir, Vector3 odir, Vector3 n) {

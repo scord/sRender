@@ -15,7 +15,7 @@ public:
     Material* material;
     Object() {};
     Object(std::vector<Shape*> geometry, Vector3 pos, double scale, Material* material);
-
+    bool isVisible;
     BoundingBox aabb;
     BoundingBox calculateBoundingBox();
     virtual double intersect(Ray ray, Shape* &intersectedGeometry);
@@ -42,7 +42,7 @@ public:
     Object* getLight(Sampler* sampler);
     Object* sampleLight(Sampler* sampler);
     Interaction* intersect(Ray ray);
-
+    Interaction* intersectVisible(Ray ray);
     Ray sampleLight();
 };
 

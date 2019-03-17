@@ -247,7 +247,7 @@ Sample3D Disc::sample(double u1, double u2) {
 	const double y = r * std::sin(theta);
     const double z = 0;
 
-    Vector3 pos = p0 + Vector3(x,y,z).rotate(n);
+    Vector3 pos = p0 + left*x + up*y;
 
 	return Sample3D(pos, 1/area);
 }
@@ -263,6 +263,10 @@ Vector2 planarUVMapping(Vector3 pos, Vector3 p0, Vector3 left, Vector3 up, Vecto
     Vector3 d = pos - p0;
     double x = (d.dot(left) + size.x)/(size.x*2);
     double y = (d.dot(up) + size.y)/(size.y*2);
+    if (x > 1)
+        x = 1;
+    if (y > 1)
+        y = 1;
     return Vector2(x, y);
 }
 
@@ -271,6 +275,11 @@ std::function<Vector2(Vector3)> Shape::defaultUVMapping() {
 }
 
 std::function<Vector2(Vector3)> Quad::defaultUVMapping() {
+    using namespace std::placeholders; 
+    return std::bind(planarUVMapping, _1, p0, left, up, size);
+}
+
+std::function<Vector2(Vector3)> Disc::defaultUVMapping() {
     using namespace std::placeholders; 
     return std::bind(planarUVMapping, _1, p0, left, up, size);
 }

@@ -5,14 +5,14 @@
 #include <sstream>
 #include <memory>
 #include "../core/smath.h"
-#include "../core/image.h"
+#include "../core/texture.h"
 
 class PPMReader {
 public:
     std::ifstream file;
     PPMReader(std::string filepath) : file(filepath) {};
 
-    Image load() {
+    Texture load() {
         std::string line;
         std::getline(file, line);
 
@@ -47,7 +47,7 @@ public:
             }            
         }
 
-        return Image(image);
+        return Texture(image);
     };
 
 };

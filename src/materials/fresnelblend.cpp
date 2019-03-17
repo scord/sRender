@@ -4,39 +4,27 @@
 #include <assert.h>
 FresnelBlend::FresnelBlend() : hemisphere(Hemisphere(Vector3(), 1)){
     roughness = 0.5;
-    alpha = roughness * roughness;
-    alpha2 = alpha*alpha;
-}
-FresnelBlend::FresnelBlend(Vector3 albedo) : hemisphere(Hemisphere(Vector3(), 1)){
-    this->albedo = albedo;
-    this->roughness = 1.0;
-    alpha = roughness * roughness;
+    alpha = 0.5*0.5;
     alpha2 = alpha*alpha;
 }
 
-FresnelBlend::FresnelBlend(Vector3 albedo, Vector3 emission) : hemisphere(Hemisphere(Vector3(), 1)){
-    this->albedo = albedo;
-    this->emission = emission;
-}
 
-FresnelBlend::FresnelBlend(Vector3 albedo, double roughness) : roughness(roughness), hemisphere(Hemisphere(Vector3(), 1)) {
-    this->albedo = albedo;
-    this->specularAlbedo = albedo;
+FresnelBlend::FresnelBlend(Vector3 albedo, Vector3 specularAlbedo, double roughness) :
+    diffuseAlbedo(albedo),
+    specularAlbedo(specularAlbedo),
+    roughness(roughness),
+    hemisphere(Hemisphere(Vector3(), 1)) {
+
     alpha = roughness * roughness;
     alpha2 = alpha*alpha;
 }
 
-FresnelBlend::FresnelBlend(Vector3 albedo, Vector3 specularAlbedo, double roughness) : roughness(roughness), hemisphere(Hemisphere(Vector3(), 1)) {
-    this->albedo = albedo;
-    this->specularAlbedo = specularAlbedo;
-    alpha = roughness * roughness;
-    alpha2 = alpha*alpha;
-}
+FresnelBlend::FresnelBlend(Texture& diffuseTexture, Vector3 specularAlbedo, double roughness) :
+    specularAlbedo(specularAlbedo),
+    roughness(roughness),
+    hemisphere(Hemisphere(Vector3(), 1)) {
 
-FresnelBlend::FresnelBlend(Image& texture, Vector3 specularAlbedo, double roughness) : roughness(roughness), texture(texture), hemisphere(Hemisphere(Vector3(), 1)) {
-    textured = true;
-
-    this->specularAlbedo = specularAlbedo;
+    diffuseAlbedo.bindTexture(diffuseTexture);
     alpha = roughness * roughness;
     alpha2 = alpha*alpha;
 }
@@ -75,7 +63,7 @@ Vector3 FresnelBlend::fresnel(Vector3 r0, double cost) {
     return r0 + (Vector3(1,1,1) - r0)*std::pow(1-cost, 5);
 }
 
-Vector3 FresnelBlend::getBrdf(Vector3 idir, Vector3 odir, Vector3 n, Vector3 p) {
+Vector3 FresnelBlend::getBrdf(Vector3 idir, Vector3 odir, Vector3 n, Vector2 uv) {
     double costi = n.dot(idir);
     if (costi < 0) {
         return Vector3();
@@ -89,11 +77,11 @@ Vector3 FresnelBlend::getBrdf(Vector3 idir, Vector3 odir, Vector3 n, Vector3 p) 
     double d = distribution(cost);
 
     double g = g2(costi, costo);
-    Vector3 f = fresnel(specularAlbedo, idir.dot(wm));
+    Vector3 f = fresnel(specularAlbedo.value(uv), idir.dot(wm));
 
-    Vector3 diffuse = (getAlbedo(p)*IPI)*(Vector3(1,1,1)-specularAlbedo)*(28.0/23.0)*(1-std::pow(1-costi/2, 5))*(1-std::pow(1-costo/2, 5));
+    Vector3 diffuse = (diffuseAlbedo.value(uv)*IPI)*(Vector3(1,1,1)-specularAlbedo.value(uv))*(28.0/23.0)*(1-std::pow(1-costi/2, 5))*(1-std::pow(1-costo/2, 5));
     
-    return (diffuse + specularAlbedo*d*g*f/(4*costi*costo));
+    return (diffuse + specularAlbedo.value(uv)*d*g*f/(4*costi*costo));
 }
 
 Vector3 FresnelBlend::getBrdf(Vector3 idir, Vector3 odir, Vector3 n) {
@@ -110,21 +98,21 @@ Vector3 FresnelBlend::getBrdf(Vector3 idir, Vector3 odir, Vector3 n) {
     double d = distribution(cost);
 
     double g = g2(costi, costo);
-    Vector3 f = fresnel(specularAlbedo, idir.dot(wm));
+    Vector3 f = fresnel(specularAlbedo.value(), idir.dot(wm));
 
-    Vector3 diffuse = (albedo*IPI)*(Vector3(1,1,1)-specularAlbedo)*(28.0/23.0)*(1-std::pow(1-costi/2, 5))*(1-std::pow(1-costo/2, 5));
+    Vector3 diffuse = (diffuseAlbedo.value()*IPI)*(Vector3(1,1,1)-specularAlbedo.value())*(28.0/23.0)*(1-std::pow(1-costi/2, 5))*(1-std::pow(1-costo/2, 5));
     
-    return (diffuse + specularAlbedo*d*g*f/(4*costi*costo));
+    return (diffuse + specularAlbedo.value()*d*g*f/(4*costi*costo));
 }
 
 Vector3 FresnelBlend::getBrdf(double nidir, double nodir, double mdir, double d) {
     if (nidir < 0)
         return Vector3();
     
-    Vector3 f = fresnel(specularAlbedo, mdir);
+    Vector3 f = fresnel(specularAlbedo.value(), mdir);
     double g = g2DividedBy2CosiCoso(nidir, nodir);
-    Vector3 diffuse = (albedo*IPI)*(Vector3(1,1,1)-specularAlbedo)*(28.0/23.0)*(1-std::pow(1-nidir/2, 5))*(1-std::pow(1-nodir/2, 5));
-    return diffuse + specularAlbedo*d*g*f/2.0;
+    Vector3 diffuse = (diffuseAlbedo.value()*IPI)*(Vector3(1,1,1)-specularAlbedo.value())*(28.0/23.0)*(1-std::pow(1-nidir/2, 5))*(1-std::pow(1-nodir/2, 5));
+    return diffuse + specularAlbedo.value()*d*g*f/2.0;
 }
 
 SampleBSDF FresnelBlend::sampleSpecular(Vector3 odir, Vector3 n, Sampler* sampler) {
@@ -163,13 +151,11 @@ SampleBSDF FresnelBlend::sampleSpecular(Vector3 odir, Vector3 n, Sampler* sample
     double dirdotwm = odir.dot(wm);
     Vector3 idir = wm*dirdotwm*2 - odir;
     double costi = n.dot(idir);
-    double costo = n.dot(odir);
-    double costm = n.dot(wm);
-    double d = distribution(costm);
+
     if (costi < 0)
         return SampleBSDF(idir, Vector3(), 0, getPdf(idir, odir, n));
 
-    return SampleBSDF(idir, getBrdf(costi, costo, dirdotwm, d), costi, getPdf(idir, odir, n));
+    return SampleBSDF(idir, Vector3(), costi, getPdf(idir, odir, n));
 }
 
 SampleBSDF FresnelBlend::sampleDiffuse(Vector3 odir, Vector3 n, Sampler* sampler) {
@@ -208,9 +194,3 @@ double FresnelBlend::getPdf(Vector3 idir, Vector3 odir, Vector3 n) {
     return 0.5*pdf + 0.5*std::abs(idir.dot(n))*IPI;
 }
 
-Vector3 FresnelBlend::getAlbedo(Vector3 p) {
-    if (textured)
-        return texture.sample(uvMapping(p));
-    else
-        return albedo;
-};

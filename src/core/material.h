@@ -5,25 +5,65 @@
 #include "../core/sample.h"
 #include "../samplers/sampler.h"
 #include <functional>
-#include "../core/image.h"
+#include "../core/texture.h"
 #include "geometry.h"
+#include "texture.h"
+
+
+template <class T>
+class MaterialProperty {
+public:
+    
+    MaterialProperty() {
+        value_ = [](Vector2& uv){return T();};
+    }
+
+    MaterialProperty(T value) {
+        uniformValue = value;
+        value_ = [&](Vector2& uv){return uniformValue;};
+    }
+
+    MaterialProperty(Texture& tex) {
+        texture = tex;
+        value_ = [&](Vector2& uv){return texture.sample(uv);};
+    }
+
+    void bindTexture(Texture& tex) {
+        texture = tex;
+        value_ = [&](Vector2& uv){return texture.sample(uv);};
+    }
+
+    void bindTexture(Texture& tex, Vector3 scale) {
+        texture = tex;
+        this->scale = scale;
+        value_ = [&](Vector2& uv){return this->scale*texture.sample(uv);};
+    }
+
+    T value(Vector2& uv) {
+        return value_(uv);
+    }
+
+    T value() {
+        return uniformValue;
+    }
+
+private:
+    Texture texture;
+    std::function<T(Vector2& uv)> value_;
+    T uniformValue;
+    T scale;
+    
+};
 
 class Material {
 public:
-    using Mapping = std::function<Vector3(Vector3)>;
-    using UVMapping = std::function<Vector2(Vector3)>;
+
     Material();
-    Vector3 albedo;
-    Vector3 emission;
-    virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector3 p);
-    virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n) = 0;
+    Material(Vector3 albedo, Vector3 emission);
+    MaterialProperty<Vector3> albedo;
+    MaterialProperty<Vector3> emission;
+    virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector2 uv) = 0;
     virtual SampleBSDF sample(Vector3 dir, Vector3 n, Sampler* sampler) = 0;
     virtual double getPdf(Vector3 dir, Vector3 odir, Vector3 n) = 0;
-    virtual Vector3 reflectance(Vector3 dir, Vector3 odir, Vector3 n);
-    virtual void bind(Shape* geometry);
-    std::function<Vector2(Vector3)> uvMapping;
-    virtual Vector3 getAlbedo(Vector3 p);
-    Image texture;
 
-    bool textured = false;
 };

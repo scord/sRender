@@ -77,6 +77,8 @@ public:
     double calculateArea();
     Sample3D sample(double u1, double u2);
     Matrix3 rotationMatrix;
+    virtual std::function<Vector2(Vector3)> defaultUVMapping();
+
 };
 
 class Quad : public Plane {

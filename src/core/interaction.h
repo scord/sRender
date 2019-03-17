@@ -11,9 +11,9 @@
 class Interaction {
 public:
     Interaction();
-    Interaction(Vector3 direction, Vector3 pos, Vector3 n, Material* material, bool backward);
+    Interaction(Vector3 direction, Vector3 pos, Vector2 uv, Vector3 n, Material* material, bool backward);
 
-    Interaction(Vector3 odir, Vector3 idir, Vector3 pos, Vector3 n, Material* material, bool backward, double pdf);
+    Interaction(Vector3 odir, Vector3 idir, Vector3 pos, Vector2 uv, Vector3 n, Material* material, bool backward, double pdf);
 
     Ray getOutgoing();
     Ray getIncoming();
@@ -23,9 +23,10 @@ public:
     void forceSample(Vector3 idir, double pdf);
     double getPdf();
     Vector3 getBrdf();
+    Vector3 emission;
 
-    Vector3 getReflectance();
     Vector3 position;
+    Vector2 uv;
     Vector3 normal;
     Vector3 odir;
     Vector3 idir;

@@ -18,7 +18,6 @@ public:
     double alpha;
     double alpha2;
     Hemisphere hemisphere;
-    Vector3 specularAlbedo;
     double distribution(double cost);
     double g1(double cost);
     double g1DividedBy2Cos(double cost) ;
@@ -27,10 +26,8 @@ public:
     double fresnel(double etai, double etat, double cost);
     Vector3 fresnel(Vector3 r0, double cost);
     virtual double getPdf(Vector3 dir, Vector3 odir, Vector3 n);
-    virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n);
+    virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector2 uv);
     virtual SampleBSDF sample(Vector3 dir, Vector3 n, Sampler* sampler);
-
-    Vector3 getBrdf(double nidir, double nodir, double mdir, double d);
 
 };
 

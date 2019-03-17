@@ -5,7 +5,9 @@
 Scene::Scene() {}
 
 void Scene::add(Object* object) {
+    object->isVisible = true;
     objects.push_back(object);
+
     for (auto g : object->geometry) {
         if (g->isLight) {
             lightGeometry.push_back(g);
@@ -14,6 +16,7 @@ void Scene::add(Object* object) {
 }
 
 void Scene::addLight(Object* object) {
+    object->isVisible = false;
     objects.push_back(object);
     lights.push_back(object);
 }
@@ -37,6 +40,50 @@ Object* Scene::sampleLight(Sampler* sampler) {
         return nullptr;
     }
 }
+
+
+Interaction* Scene::intersectVisible(Ray ray) {
+
+    double minT = 99999;
+    bool intersectionFound = false;
+    
+    Object* intersectedObject;
+    Shape* intersectedGeo;
+ 
+    for (auto object : objects) {
+
+        if (!object->isVisible)
+            continue;
+ 
+        Shape* geo;
+        double t = object->intersect(ray, geo);
+
+        if (t < minT && t > 0.000001) {
+            minT = t;
+    
+            intersectedGeo = geo;
+            intersectionFound = true;
+            intersectedObject = object;
+        }
+
+
+    }
+
+    if (intersectionFound) {
+        Vector3 intersection = ray.origin+ray.direction*minT;
+
+        return new Interaction(Vector3()-ray.direction,
+                            intersection,
+                            intersectedGeo->defaultUVMapping()(intersection),
+                            intersectedGeo->normal(intersection),
+                            intersectedObject->material,
+                            true);
+    } else {
+        return nullptr;
+    }
+}
+
+
 
 Interaction* Scene::intersect(Ray ray) {
 
@@ -67,6 +114,7 @@ Interaction* Scene::intersect(Ray ray) {
 
         return new Interaction(Vector3()-ray.direction,
                             intersection,
+                            intersectedGeo->defaultUVMapping()(intersection),
                             intersectedGeo->normal(intersection),
                             intersectedObject->material,
                             true);
@@ -79,8 +127,6 @@ Object::Object(std::vector<Shape*> geometry, Vector3 pos, double scale, Material
     for (int i = 0; i < geometry.size(); i++) {
         geometry[i]->transform(pos, Vector3(scale, scale, scale));
     }    
-
-    material->bind(geometry[0]);
 }
 
 KDTreeObject::KDTreeObject(std::vector<Shape*> geometry, Vector3 pos, double scale, Material* material) : 

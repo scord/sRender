@@ -19,8 +19,10 @@
 #include "materials/orennayar.h"
 #include "materials/fresnelblend.h"
 #include "materials/ggxmaterial.h"
+#include "materials/emissive.h"
+
 #include "io/ppmreader.h"
-#include "core/image.h"
+#include "core/texture.h"
 #define PI 3.1415926536
 
 std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth);
@@ -50,15 +52,16 @@ int main() {
 	
 	OrenNayarMaterial* on = new OrenNayarMaterial(Vector3(0.9, 0.1, 0.1), 0.2);
 
-	Image woodImage = PPMReader("/Users/samcordingley/test.ppm").load();
-	Image concreteImage = PPMReader("/Users/samcordingley/dev/sRender/concrete.ppm").load();
+	Texture woodTexture = PPMReader("/Users/samcordingley/test.ppm").load();
+	Texture concreteTexture = PPMReader("/Users/samcordingley/dev/sRender/concrete.ppm").load();
+	Texture lightTexture = PPMReader("/Users/samcordingley/dev/sRender/light.ppm").load();
 
-	scene.add(new Object(floorGeometry, Vector3(0,0,0), 1, new FresnelBlend(woodImage, Vector3(0.5,0.5,0.5), 0.3)));
-	scene.add(new Object(leftWallGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(concreteImage)));
-	scene.add(new Object(rightWallGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(concreteImage)));
-	scene.add(new Object(ceilingGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(concreteImage)));
-	scene.add(new Object(backWallGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(concreteImage)));
-	scene.add(new Object(frontWallGeometry, Vector3(0,0,0), 1, new OrenNayarMaterial(concreteImage)));
+	scene.add(new Object(floorGeometry, Vector3(0,0,0), 1, new FresnelBlend(woodTexture, Vector3(0.5,0.5,0.5), 0.2)));
+	scene.add(new Object(leftWallGeometry, Vector3(0,0,0), 1, new FresnelBlend(concreteTexture, Vector3(0.5,0.5,0.5), 0.6)));
+	scene.add(new Object(rightWallGeometry, Vector3(0,0,0), 1, new FresnelBlend(concreteTexture, Vector3(0.5,0.5,0.5), 0.6)));
+	scene.add(new Object(ceilingGeometry, Vector3(0,0,0), 1, new FresnelBlend(concreteTexture, Vector3(0.5,0.5,0.5), 0.6)));
+	scene.add(new Object(backWallGeometry, Vector3(0,0,0), 1, new FresnelBlend(concreteTexture, Vector3(0.5,0.5,0.5), 0.6)));
+	scene.add(new Object(frontWallGeometry, Vector3(0,0,0), 1, new FresnelBlend(concreteTexture, Vector3(0.5,0.5,0.5), 0.6)));
 
 	// BOX
 	//scene.push_back(new Quad(Vector3(-0.5,0.1,-0.5), Vector3(0,1,0), Vector3(1,1,1), new DiffuseMaterial(), Vector2(0.25,0.25), Vector3(0,0,-1)));
@@ -74,16 +77,16 @@ int main() {
 	//scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.5, 0.3, 0.2), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
 //	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.2, -0.1, -0.5), 0.3)}, Vector3(0,0,0), 1, new SpecularMaterial(Vector3(1,1,1))));
 	
-	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(-0.3, -0.6, -0.35), 0.4)}, Vector3(0,0,0), 1, new FresnelBlend(Vector3(0.05,0.1,0.6), Vector3(0.4,0.4,0.4), 0.3)));
+	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(-0.3, -0.6, -0.35), 0.4)}, Vector3(0,0,0), 1, new OrenNayarMaterial(Vector3(1.0,1.0,1.0), 0.15)));
 	scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.4, -0.6, 0.2), 0.4)}, Vector3(0,0,0), 1, new FresnelBlend(Vector3(0.2,0.1,0.5), Vector3(0.4,0.4,0.4), 0.5)));
 	//scene.add(new Object(std::vector<Shape*>{new Sphere(Vector3(0.4, -0.6, 0.2), 0.4)}, Vector3(0,0,0), 1, new GGXMaterial(Vector3(0.2,0.1,0.5), Vector3(0.4,0.4,0.4), 0.1)));
 
-	Shape* areaLight = new Disc(Vector3(0.0,0.999,0.0), Vector3(0,-1,0), Vector2(0.5,0.5));
+	Shape* areaLight = new Disc(Vector3(0.0,0.99,0.0), Vector3(0,-1,0), Vector2(0.5,0.5));
 	//Shape* areaLight = new Disc(Vector3(-0.5,0.999,0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
 	Shape* areaLight2 = new Disc(Vector3(0.5,0.999,0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
-	//Shape* areaLight3 = new Disc(Vector3(0.6,-0.7,-0.999), Vector3(0,0,1), Vector2(0.25,0.25));
+	Shape* areaLight3 = new Disc(Vector3(0.6,-0.7,-0.999), Vector3(0,0,1), Vector2(0.25,0.25));
 	Shape* areaLight4 = new Disc(Vector3(0.5,0.999,-0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
-	Shape* areaLight3 = new Disc(Vector3(-0.5,0.999,-0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
+	//Shape* areaLight3 = new Disc(Vector3(-0.5,0.999,-0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
 
 	std::vector<Shape*> lightGeometry;
 	lightGeometry.push_back(areaLight);
@@ -94,23 +97,23 @@ int main() {
 	std::vector<Shape*> lightGeometry4;
 	lightGeometry4.push_back(areaLight4);
 	
-	scene.addLight(new Object(lightGeometry, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(1000,900,800))));
+	scene.addLight(new Object(lightGeometry, Vector3(0,0,0), 1, new EmissiveMaterial(lightTexture, Vector3(1000,1000,1000))));
 
 	//scene.addLight(new Object(lightGeometry, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(900,500,500))));
 	//scene.addLight(new Object(lightGeometry2, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(1000,900,80))));
 //	scene.addLight(new Object(lightGeometry3, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(100,900,800))));
 //	scene.addLight(new Object(lightGeometry4, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(500,900,500))));
 
-	std::vector<std::vector<Vector3>> image;
+	std::vector<std::vector<Vector3>> texture;
 
 	for (int i=0; i < cam.width; i++) {
-        image.push_back(std::vector<Vector3>());
+        texture.push_back(std::vector<Vector3>());
         for (int j = 0; j < cam.height; j++) {
-            image[i].push_back(Vector3(0,0,0));
+            texture[i].push_back(Vector3(0,0,0));
         }
     }
 
-	int samplesPerPixel = 64;
+	int samplesPerPixel = 256;
 	
 	auto start = std::chrono::high_resolution_clock::now();
 	
@@ -147,7 +150,7 @@ int main() {
 		
 		for (int i = 0; i < tile.size(); i++ ) {
 			for (int j =0; j < tile[0].size(); j++) {
-				image[k*tile.size()+i][j] = tile[i][j];
+				texture[k*tile.size()+i][j] = tile[i][j];
 			}
 		}
 		k++;
@@ -159,16 +162,16 @@ int main() {
 
 	std::cout << "Elapsed time: " << elapsed.count() << " s\n";
 
-	image = ToneMapper::reinhard(image);
+	texture = ToneMapper::reinhard(texture);
 
 	FILE *f = fopen("image.ppm", "w");
 	fprintf(f, "P3\n%d %d\n%d\n ",cam.width,cam.height,65535);
 	for (int j=0;j<cam.height;j++) {
 		for (int i=0;i<cam.width;i++) {
 
-			fprintf(f,"%d %d %d ", (int)(65535*image[i][j].x),
-								   (int)(65535*image[i][j].y),
-								   (int)(65535*image[i][j].z));
+			fprintf(f,"%d %d %d ", (int)(65535*texture[i][j].x),
+								   (int)(65535*texture[i][j].y),
+								   (int)(65535*texture[i][j].z));
 		}
 		fprintf(f, "\n");
 	}

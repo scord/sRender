@@ -49,14 +49,13 @@ double SpecularMaterial::fresnel(double cosi, double etai, double etat) {
     }
 }
 
-SpecularMaterial::SpecularMaterial() {
+SpecularMaterial::SpecularMaterial() : Material() {
 }
-SpecularMaterial::SpecularMaterial(Vector3 albedo) {
-    this->albedo = albedo;
+SpecularMaterial::SpecularMaterial(Vector3 albedo) : Material(albedo, Vector3()){
 }
 
-Vector3 SpecularMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n) {
-    return albedo;
+Vector3 SpecularMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector2 uv) {
+    return albedo.value(uv);
 }
 
 SampleBSDF SpecularMaterial::sample(Vector3 dir, Vector3 n, Sampler* sampler) {
@@ -91,7 +90,7 @@ SampleBSDF SpecularMaterial::sample(Vector3 dir, Vector3 n, Sampler* sampler) {
         newDirection = dir*eta + n*(eta*cosi - cost);
     }
 
-    return SampleBSDF(newDirection, albedo, 1, 1);
+    return SampleBSDF(newDirection, Vector3(), 1, 1);
 }
 
 double SpecularMaterial::getPdf(Vector3 dir, Vector3 odir, Vector3 n) {

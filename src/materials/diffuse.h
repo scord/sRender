@@ -14,7 +14,7 @@ public:
     DiffuseMaterial(Vector3 albedo, Vector3 emission);
     Hemisphere hemisphere;
     virtual double getPdf(Vector3 dir, Vector3 odir, Vector3 n);
-    virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n);
+    virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector2 uv);
     virtual SampleBSDF sample(Vector3 dir, Vector3 n, Sampler* sampler);
 };
 
