@@ -1,30 +1,31 @@
 #include "geometry.h"
 #include "../core/smath.h"
 #include <cmath>
-
+#include <iostream>
+#include <cassert>
 
 Triangle::Triangle(Vector3 v0, Vector3 v1, Vector3 v2) : Shape(v0), v1(v1), v2(v2) {
-    n = (v1 - v0).cross(v2 - v0).norm();
+    n = ((v1 - v0).norm()).cross((v2 - v0).norm()).norm();
     aabb = calculateBoundingBox();
 }
 
 Vector3 Triangle::samplePoint() {
-
+    return Vector3();
 }
 Vector3 Disc::samplePoint() {
-    
+    return Vector3();   
 }
 Vector3 Quad::samplePoint() {
-    
+    return Vector3();    
 }
 Vector3 Sphere::samplePoint() {
-    
+    return Vector3();    
 }
 Vector3 Hemisphere::samplePoint() {
-    
+    return Vector3();    
 }
 Vector3 Plane::samplePoint() {
-    
+    return Vector3();    
 }
 
 
@@ -34,27 +35,16 @@ Vector3 Triangle::normal(Vector3 p) {
 }
 
 
-double Triangle::Intersect(Ray ray, Vector3& intersection2) {
+double Triangle::Intersect(Ray ray) {
 
-    Vector3 tv0 = p0;
-    Vector3 tv1 = v1;
-    Vector3 tv2 = v2;
 
     double np = ray.direction.dot(n);
-    double t = (tv0.dot(n)-ray.origin.dot(n))/np;
+    double t = (p0.dot(n)-ray.origin.dot(n))/np;
     Vector3 intersection = ray.origin + ray.direction*t;
     
-    Vector3 edge0 = tv1 - tv0;
-    Vector3 vp0 = intersection - tv0;
-    if (n.dot(edge0.cross(vp0)) < 0) return -1;
-
-    Vector3 edge1 = tv2 - tv1;
-    Vector3 vp1 = intersection - tv1;
-    if (n.dot(edge1.cross(vp1)) < 0) return -1;
-
-    Vector3 edge2 = tv0 - tv2;
-    Vector3 vp2 = intersection - tv2;
-    if (n.dot(edge2.cross(vp2)) < 0) return -1;
+    if (n.dot((v1 - p0).cross(intersection - p0)) < 0) return -1;
+    if (n.dot((v2 - v1).cross(intersection - v1)) < 0) return -1;
+    if (n.dot((p0 - v2).cross(intersection - v2)) < 0) return -1;
 
     return t;
 }
@@ -98,7 +88,9 @@ void BoundingBox::transform(Vector3 position, Vector3 scale) {
 BoundingBox::BoundingBox(Vector3 min, Vector3 max) : min(min), max(max) {}
 
 bool BoundingBox::overlaps(BoundingBox box) {
-    if (contains(box.min) || contains(box.max)) {
+    if (((min.x <= box.max.x ) && (box.min.x <= max.x ) &&
+       (min.y <= box.max.y ) && (box.min.y <= max.y ) &&
+       (min.z <= box.max.z ) && (box.min.z <= max.z ))) {
         return true;
     } else {
         return false;
@@ -106,11 +98,65 @@ bool BoundingBox::overlaps(BoundingBox box) {
 }
 
 bool BoundingBox::contains(Vector3 p) {
-    if (p.x >= min.x && p.y >= min.y && p.z >= min.z && p.x <= max.x && p.y <= max.y && p.z <= max.z) {
+    if (p.x >= min.x -EPS && p.y >= min.y -EPS&& p.z >= min.z -EPS&& p.x <= max.x +EPS && p.y <= max.y +EPS && p.z <= max.z+EPS) {
         return true;
     } else {
         return false;
     }
+}
+
+double BoundingBox::intersectPlane(Vector3 p, Vector3 n, Ray ray) {
+    double np = ray.direction.dot(n);
+    return (p.dot(n)-ray.origin.dot(n))/np;
+}
+
+std::vector<Vector3> BoundingBox::intersect(Ray ray) {
+
+    double t1 = 0;
+    std::vector<Vector3> intersections;
+
+    for (int i = 0; i < 3; i++) {
+        double t = intersectPlane(min, Vector3(i == 0, i == 1, i == 2), ray);
+        Vector3 intersection = ray.origin + ray.direction*t;
+        if (t > EPS && contains(intersection)) {
+            if (t > t1) {
+                t1 = t;
+                intersections.push_back(intersection);
+            } else
+                intersections.insert(intersections.begin(), intersection);
+        }
+    }
+
+    for (int i = 0; i < 3; i++) {
+        double t = intersectPlane(max, Vector3(-(i == 0), -(i == 1), -(i == 2)), ray);
+        Vector3 intersection = ray.origin + ray.direction*t;
+        if (t > EPS && contains(intersection)) {
+            if (t > t1) {
+                t1 = t;
+                intersections.push_back(intersection);
+            } else
+                intersections.insert(intersections.begin(), intersection);
+        }
+    }
+    
+
+    if (contains(ray.origin)) {
+        intersections.insert(intersections.begin(), ray.origin);
+    }
+
+
+    return intersections;
+    //return std::pair<nullptr, nullptr>;
+
+
+/*     double t = Plane::Intersect(ray, intersection);
+    Vector3 d = intersection - p0;
+    Vector2 dist = Vector2(d.dot(left), d.dot(up));
+    if (std::abs(dist.x) <= size.x && std::abs(dist.y) <= size.y) {
+        return t; 
+    } else {
+        return -1;
+    } */
 }
 
 bool BoundingBox::intersects(Ray ray) {
@@ -190,13 +236,14 @@ Vector3 Plane::normal(Vector3 p) {
     return n;
 }
 
-double Plane::Intersect(Ray ray, Vector3& intersection) {
+double Plane::Intersect(Ray ray) {
+
     double np = ray.direction.dot(n);
     if (np > 0){
         return 0;
     }
     double t = (p0.dot(n)-ray.origin.dot(n))/np;
-    intersection = ray.origin + ray.direction*t;
+
     return t;
 }
 
@@ -215,9 +262,10 @@ Disc::Disc(Vector3 p0, Vector3 n, Vector2 size) : Plane(p0, n), size(size) {
     rotationMatrix = n.rotationMatrix();
 }
 
-double Disc::Intersect(Ray ray, Vector3& intersection) {
-    double t = Plane::Intersect(ray, intersection);
-    if ((intersection - p0).length() < size.length()) {
+double Disc::Intersect(Ray ray) {
+    double t = Plane::Intersect(ray);
+    Vector3 intersection = ray.origin + ray.direction*t;
+    if ((intersection - p0).length() < size.x) {
         return t;
     } else {
         return -1;
@@ -288,8 +336,9 @@ BoundingBox Quad::calculateBoundingBox() {
     return BoundingBox(Vector3(), Vector3());
 }
 
-double Quad::Intersect(Ray ray, Vector3& intersection) {
-    double t = Plane::Intersect(ray, intersection);
+double Quad::Intersect(Ray ray) {
+    double t = Plane::Intersect(ray);
+    Vector3 intersection = ray.origin + ray.direction*t;
     Vector3 d = intersection - p0;
     Vector2 dist = Vector2(d.dot(left), d.dot(up));
     if (std::abs(dist.x) <= size.x && std::abs(dist.y) <= size.y) {
@@ -308,7 +357,7 @@ void Quad::transform(Vector3 position, Vector3 scale) {
 
 Sphere::Sphere(Vector3 p0, double r) : Shape(p0), radius(r) {}
 
-double Sphere::Intersect(Ray ray, Vector3& intersection) {
+double Sphere::Intersect(Ray ray) {
     Vector3 dir2 = ray.origin-p0;
     double b = (dir2*2).dot(ray.direction);
     double c = dir2.dot(dir2) - (radius*radius);
@@ -320,8 +369,8 @@ double Sphere::Intersect(Ray ray, Vector3& intersection) {
     double s1 = -b + d;
     double s2 = -b - d;
     
-    double t = (s2>0.000000001) ? s2/2 : ((s1>0.00000001) ? s1/2 : 0);
-    intersection = ray.origin + ray.direction*t;
+    double t = (s2>EPS) ? s2/2 : ((s1>EPS) ? s1/2 : 0);
+  
     return t;
 
 }
@@ -353,7 +402,7 @@ Sample3D Hemisphere::map(Sample2D sample) {
 	return Sample3D(Vector3(x, y, height), sample.pdf*height*IPI);
 }
 
-double Hemisphere::Intersect(Ray ray, Vector3& intersection) {
+double Hemisphere::Intersect(Ray ray) {
     Vector3 dir2 = ray.origin-p0;
     double b = (dir2*2).dot(ray.direction);
     double c = dir2.dot(dir2) - (radius*radius);
@@ -365,8 +414,8 @@ double Hemisphere::Intersect(Ray ray, Vector3& intersection) {
     double s1 = -b + d;
     double s2 = -b - d;
     
-    double t = (s2>0.0000001) ? s2/2 : ((s1>0.0000001) ? s1/2 : 0);
-    intersection = ray.origin + ray.direction*t;
+    double t = (s2>EPS) ? s2/2 : ((s1>EPS) ? s1/2 : 0);
+
     return t;
 
 }

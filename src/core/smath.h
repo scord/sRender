@@ -5,6 +5,7 @@
 const double PI = 3.141592653589793238463;
 const double TAU = 2*PI;
 const double IPI = 1/PI;
+const double EPS = 0.000000001;
 
 struct Vector3;
 

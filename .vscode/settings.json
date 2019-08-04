@@ -65,7 +65,8 @@
         "cstring": "cpp",
         "functional": "cpp",
         "ios": "cpp",
-        "locale": "cpp"
+        "locale": "cpp",
+        "list": "cpp"
     },
     "C_Cpp.configurationWarnings": "Disabled"
 }

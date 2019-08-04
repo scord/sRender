@@ -173,13 +173,13 @@ BoundingBox Object::calculateBoundingBox() {
 }
 double Object::intersect(Ray ray, Shape* &intersectedGeometry) {
     
-    Vector3 minIntersectionPoint;
+
 
     double minT = 99999;
 
     bool intersectionFound = false;
     for (auto shape : geometry) {
-        double t = shape->Intersect(ray, minIntersectionPoint);
+        double t = shape->Intersect(ray);
         if (t < minT && t > 0) {
             minT = t;
             intersectedGeometry = (shape);
@@ -193,28 +193,9 @@ double Object::intersect(Ray ray, Shape* &intersectedGeometry) {
 
 double KDTreeObject::intersect(Ray ray, Shape* &intersectedGeometry) {
 
-    std::vector<Shape*> foundGeometry = root.findGeometry(ray);
-    
-    Vector3 minIntersectionPoint;
 
-    double minT = 99999;
+    double t = root.intersect(ray, intersectedGeometry);
 
-    bool intersectionFound = false;
-    for (auto& shape : foundGeometry) {
-
-
-    
-        double t = shape->Intersect(ray, minIntersectionPoint);
-
-        if (t < minT && t > 0) {
-            minT = t;
-            intersectedGeometry = (shape);
-            intersectionFound = true;
-        }
-          
-        
-    }
-
-    return minT;
+    return t;
   
 }

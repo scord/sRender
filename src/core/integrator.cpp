@@ -3,6 +3,7 @@
 
 #include "material.h"
 #include <chrono>
+#include <assert.h>
 std::mt19937 mt;
 std::uniform_real_distribution<double> uniform;
 
@@ -98,8 +99,9 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampl
         
         nextInteractionP = scene->intersect(interaction.getIncoming());
 
-        if (interaction.uv.y < 0)
-            double test = 0.0;
+        assert(interaction.pdf >= 0);
+        assert(interaction.cost >= 0);
+        assert(interaction.brdf.x >= 0);
 
         if (interaction.pdf != 1 && DIRECT_LIGHT_SAMPLING) {
             // sample lights         
@@ -127,5 +129,6 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampl
     }
 
     delete nextInteractionP;
+
     return colour;
 }

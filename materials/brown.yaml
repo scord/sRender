@@ -1,0 +1,5 @@
+name: brown
+type: FresnelBlend
+diffuse: [0.5, 0.8, 1.0]
+specular: [0.6,0.6,0.6]
+roughness: 0.4

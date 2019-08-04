@@ -23,15 +23,24 @@
 
 #include "io/ppmreader.h"
 #include "core/texture.h"
+#include "io/scenereader.h"
 #define PI 3.1415926536
+
+volatile std::atomic<int> progress;
+int tileCount =64;
 
 std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth);
 
 int main() {
 
+	SceneReader sceneReader("/home/sam/dev/sRender/scenes/box.yaml");
+	//sceneReader.load();
+
 	Camera cam(Vector3(0,0,3), 1280, 1280, PI/6);
 
 	Scene scene;
+
+	progress = 0;
 
 	//PLYReader reader("/home/sam/dev/sRender/src/dragon.ply");
 
@@ -52,9 +61,9 @@ int main() {
 	
 	OrenNayarMaterial* on = new OrenNayarMaterial(Vector3(0.9, 0.1, 0.1), 0.2);
 
-	Texture woodTexture = PPMReader("/Users/samcordingley/test.ppm").load();
-	Texture concreteTexture = PPMReader("/Users/samcordingley/dev/sRender/concrete.ppm").load();
-	Texture lightTexture = PPMReader("/Users/samcordingley/dev/sRender/light.ppm").load();
+	Texture woodTexture = PPMReader("/home/sam/dev/sRender/concrete.ppm").load();
+	Texture concreteTexture = PPMReader("/home/sam/dev/sRender/concrete.ppm").load();
+	Texture lightTexture = PPMReader("/home/sam/dev/sRender/light.ppm").load();
 
 	scene.add(new Object(floorGeometry, Vector3(0,0,0), 1, new FresnelBlend(woodTexture, Vector3(0.5,0.5,0.5), 0.2)));
 	scene.add(new Object(leftWallGeometry, Vector3(0,0,0), 1, new FresnelBlend(concreteTexture, Vector3(0.5,0.5,0.5), 0.6)));
@@ -83,9 +92,9 @@ int main() {
 
 	Shape* areaLight = new Disc(Vector3(0.0,0.99,0.0), Vector3(0,-1,0), Vector2(0.5,0.5));
 	//Shape* areaLight = new Disc(Vector3(-0.5,0.999,0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
-	Shape* areaLight2 = new Disc(Vector3(0.5,0.999,0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
-	Shape* areaLight3 = new Disc(Vector3(0.6,-0.7,-0.999), Vector3(0,0,1), Vector2(0.25,0.25));
-	Shape* areaLight4 = new Disc(Vector3(0.5,0.999,-0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
+	Shape* areaLight2 = new Disc(Vector3(0.5,0.999,0.5), Vector3(0,-1,0), Vector2(0.4,0.4));
+	Shape* areaLight3 = new Disc(Vector3(0.6,-0.7,-0.999), Vector3(0,0,1), Vector2(0.4,0.4));
+	Shape* areaLight4 = new Disc(Vector3(0.5,0.999,-0.5), Vector3(0,-1,0), Vector2(0.4,0.4));
 	//Shape* areaLight3 = new Disc(Vector3(-0.5,0.999,-0.5), Vector3(0,-1,0), Vector2(0.25,0.25));
 
 	std::vector<Shape*> lightGeometry;
@@ -97,13 +106,13 @@ int main() {
 	std::vector<Shape*> lightGeometry4;
 	lightGeometry4.push_back(areaLight4);
 	
-	scene.addLight(new Object(lightGeometry, Vector3(0,0,0), 1, new EmissiveMaterial(lightTexture, Vector3(1000,1000,1000))));
+	scene.addLight(new Object(lightGeometry, Vector3(0,0,0), 1, new EmissiveMaterial(lightTexture, Vector3(10,10,10))));
 
 	//scene.addLight(new Object(lightGeometry, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(900,500,500))));
 	//scene.addLight(new Object(lightGeometry2, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(1000,900,80))));
 //	scene.addLight(new Object(lightGeometry3, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(100,900,800))));
 //	scene.addLight(new Object(lightGeometry4, Vector3(0,0,0), 1, new DiffuseMaterial(Vector3(1,1,1), Vector3(500,900,500))));
-
+	scene = sceneReader.load();
 	std::vector<std::vector<Vector3>> texture;
 
 	for (int i=0; i < cam.width; i++) {
@@ -113,13 +122,13 @@ int main() {
         }
     }
 
-	int samplesPerPixel = 256;
+	int samplesPerPixel = 64;
 	
 	auto start = std::chrono::high_resolution_clock::now();
 	
 	// prepare tiles
 
-	int tileCount = 16;
+	
 	int tileWidth = cam.width/tileCount;
 	std::vector<std::vector<std::vector<Vector3>>> tiles;
 
@@ -140,7 +149,7 @@ int main() {
 	std::vector<std::future<std::vector<std::vector<Vector3>>>> resultTiles;
 
 	for (int t = 0; t < tileCount; t++) {
-		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 6));
+		resultTiles.push_back(std::async(renderTile, t, tiles[t], cam, scene, samplesPerPixel, 3));
 	}
 
 	int k = 0;
@@ -209,5 +218,8 @@ std::vector<std::vector<Vector3>> renderTile(int tileNumber, std::vector<std::ve
 
 	delete pixelSampler;
 	
+	progress += 1;
+
+	std::cout << 100*progress/tileCount <<  "%\n";
 	return tile;
 }

@@ -15,7 +15,11 @@ public:
     bool intersects(Ray ray);
     bool overlaps(BoundingBox box);
     void transform(Vector3 position, Vector3 scale);
+    double intersectPlane(Vector3 p, Vector3 n, Ray ray);
+
+    std::vector<Vector3> intersect(Ray ray);
 };
+
 
 class Shape {
 public:
@@ -31,7 +35,7 @@ public:
     virtual BoundingBox calculateBoundingBox() = 0;
     virtual Vector3 samplePoint() = 0;
     virtual Vector3 normal(Vector3 p) = 0;
-    virtual double Intersect(Ray ray, Vector3 &intersection) = 0;
+    virtual double Intersect(Ray ray) = 0;
     virtual void transform(Vector3 position, Vector3 scale) = 0;
     virtual std::function<Vector2(Vector3)> defaultUVMapping();
 };
@@ -47,7 +51,7 @@ public:
     virtual Vector3 normal(Vector3 p);
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
-    virtual double Intersect(Ray ray, Vector3& intersection);
+    virtual double Intersect(Ray ray);
     virtual void transform(Vector3 position, Vector3 scale);
 };
 
@@ -61,7 +65,7 @@ public:
     
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
-    virtual double Intersect(Ray ray, Vector3 &intersection);
+    virtual double Intersect(Ray ray);
     virtual void transform(Vector3 position, Vector3 scale);
 };
 
@@ -72,7 +76,7 @@ public:
     double area;
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
-    virtual double Intersect(Ray ray, Vector3 &intersection);
+    virtual double Intersect(Ray ray);
     virtual void transform(Vector3 position, Vector3 scale);
     double calculateArea();
     Sample3D sample(double u1, double u2);
@@ -87,7 +91,7 @@ public:
     Vector2 size;
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
-    virtual double Intersect(Ray ray, Vector3 &intersection);
+    virtual double Intersect(Ray ray);
     virtual void transform(Vector3 position, Vector3 scale);
     virtual std::function<Vector2(Vector3)> defaultUVMapping();
 };
@@ -99,7 +103,7 @@ public:
     virtual Vector3 normal(Vector3 p);
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
-    virtual double Intersect(Ray ray, Vector3 &intersection);
+    virtual double Intersect(Ray ray);
     virtual void transform(Vector3 position, Vector3 scale);
 };
 
@@ -111,7 +115,7 @@ public:
     virtual Vector3 normal(Vector3 p);
     virtual BoundingBox calculateBoundingBox();
     virtual Vector3 samplePoint();
-    virtual double Intersect(Ray ray, Vector3 &intersection);
+    virtual double Intersect(Ray ray);
     virtual void transform(Vector3 position, Vector3 scale);
 };
 

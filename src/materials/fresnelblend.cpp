@@ -31,7 +31,9 @@ FresnelBlend::FresnelBlend(Texture& diffuseTexture, Vector3 specularAlbedo, doub
 
 double FresnelBlend::distribution(double cost) {
     double cos2t = cost*cost;
-    return alpha2/(PI*std::pow(cos2t*(alpha2 - 1) + 1,2));
+    double retval = alpha2/(PI*std::pow(cos2t*(alpha2 - 1) + 1,2));
+    assert(retval >= 0);
+    return retval;
 }
 
 // masking
@@ -45,7 +47,9 @@ double FresnelBlend::g1DividedBy2Cos(double cost) {
 
 // masking shadowing
 double FresnelBlend::g2(double costi, double costo) {
-    return 2.0*costi*costo/(costo*std::sqrt(alpha2+(1-alpha2)*costi*costi) + costi*std::sqrt(alpha2+(1-alpha2)*costo*costo) );
+    double retval = 2.0*costi*costo/(costo*std::sqrt(alpha2+(1-alpha2)*costi*costi) + costi*std::sqrt(alpha2+(1-alpha2)*costo*costo) );
+    assert(retval >= 0);
+    return retval;
 }
 
 double FresnelBlend::g2DividedBy2CosiCoso(double costi, double costo) {
@@ -65,14 +69,17 @@ Vector3 FresnelBlend::fresnel(Vector3 r0, double cost) {
 
 Vector3 FresnelBlend::getBrdf(Vector3 idir, Vector3 odir, Vector3 n, Vector2 uv) {
     double costi = n.dot(idir);
-    if (costi < 0) {
+    double costo = n.dot(odir);
+
+    if (costi < 0 || costo < 0) {
         return Vector3();
     }
 
     Vector3 wm = (idir+odir).norm();
 
     double cost = n.dot(wm);
-    double costo = n.dot(odir);
+
+    assert(cost >= 0);
 
     double d = distribution(cost);
 

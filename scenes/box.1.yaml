@@ -1,0 +1,16 @@
+objects:
+  - type: File
+    position: [0, 0, 0]
+    scale: 0.1
+    colour: [1, 1, 1]
+    filepath: "/home/sam/dev/sRender/src/sponza.ply"
+    material: "/home/sam/dev/sRender/materials/brown.yaml"
+lights:
+  - type: Disc
+    position: [-0.5, 10.0, -0.5]
+    radius: 10.0
+    colour: [1, 1, 1]
+    normal: [0, -1, 0]
+    intensity: 10.0
+
+

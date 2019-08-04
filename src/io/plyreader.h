@@ -35,10 +35,18 @@ public:
     Object* toObject(Vector3 pos, double scale) {
         return new Object(toTriangles(), pos, scale, new SpecularMaterial());
     }
+     Object* toObject(Vector3 pos, double scale, Material* material) {
+        return new Object(toTriangles(), pos, scale, material);
+    }
     KDTreeObject* toKDTreeObject(Vector3 pos, double scale) {
         std::vector<Shape*> test = toTriangles();
 
         return new KDTreeObject(test, pos, scale, new SpecularMaterial());
+    }
+    KDTreeObject* toKDTreeObject(Vector3 pos, double scale, Material* material) {
+        std::vector<Shape*> test = toTriangles();
+
+        return new KDTreeObject(test, pos, scale, material);
     }
     std::vector<Shape*> toTriangles() {
         std::vector<Shape*> triangles;
