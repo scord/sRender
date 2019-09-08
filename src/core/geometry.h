@@ -4,6 +4,7 @@
 #include <vector>
 #include "sample.h"
 #include <functional>
+#include "math/pga.h"
 
 class BoundingBox {
 public:
@@ -16,7 +17,7 @@ public:
     bool overlaps(BoundingBox box);
     void transform(Vector3 position, Vector3 scale);
     double intersectPlane(Vector3 p, Vector3 n, Ray ray);
-
+    double intersectPlaneG(const PGA3D& plane, const PGA3D& ray, const Vector3& dir, const Vector3& p, Vector3& intersection);
     std::vector<Vector3> intersect(Ray ray);
 };
 

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <cassert>
+#include "math/smath2.h"
 
 Triangle::Triangle(Vector3 v0, Vector3 v1, Vector3 v2) : Shape(v0), v1(v1), v2(v2) {
     n = ((v1 - v0).norm()).cross((v2 - v0).norm()).norm();
@@ -50,6 +51,12 @@ double Triangle::Intersect(Ray ray) {
 }
 
 void Triangle::transform(Vector3 position, Vector3 scale) {
+
+
+/*     p0 = rotateVector(p0, Vector3(0,0,0), Vector3(0,1,0), 0.9f);
+    v1 = rotateVector(v1, Vector3(0,0,0), Vector3(0,1,0), 0.9f);
+    v2 = rotateVector(v2, Vector3(0,0,0), Vector3(0,1,0), 0.9f);
+ */
     p0.x *= scale.x;
     p0.y *= scale.y;
     p0.z *= scale.z;
@@ -71,7 +78,9 @@ void Triangle::transform(Vector3 position, Vector3 scale) {
     v2.y += position.y;
     v2.z += position.z;
 
-    aabb.transform(position, scale);
+
+    aabb = calculateBoundingBox();
+  
 }
 
 void BoundingBox::transform(Vector3 position, Vector3 scale) {
@@ -105,9 +114,56 @@ bool BoundingBox::contains(Vector3 p) {
     }
 }
 
+double BoundingBox::intersectPlaneG(const PGA3D& plane, const PGA3D& ray, const Vector3& dir, const Vector3& p, Vector3& intersection) {
+
+
+
+    PGA3D intersection_point = ray ^ plane;
+    intersection = pointToVector(intersection_point);
+    Vector3 dir2 = intersection - p;
+
+    PGA3D intersection_line = toPoint(p) & intersection_point;
+
+    PGA3D dottest = ray*intersection_line;
+
+
+    if (dir.dot(dir2) >= 0 )
+        return  dir2.length();
+    else {
+        return -dir2.length();
+    }
+
+    
+
+    
+   // return (p.dot(n)-ray.origin.dot(n))/np;
+}
+
 double BoundingBox::intersectPlane(Vector3 p, Vector3 n, Ray ray) {
-    double np = ray.direction.dot(n);
-    return (p.dot(n)-ray.origin.dot(n))/np;
+
+    PGA3D pp = toPoint(p);
+    PGA3D l = toLine(p, p+n);
+
+    PGA3D plane = (l | pp);
+
+    PGA3D rayl = toPoint(ray.origin) & toPoint(ray.origin + ray.direction);
+    PGA3D intersection_point = rayl ^ plane;
+    PGA3D intersection_line = toPoint(ray.origin) & intersection_point;
+    Vector3 dir = pointToVector(intersection_point) - ray.origin;
+
+    PGA3D dottest = rayl*intersection_point;
+
+
+    if (ray.direction.dot(dir) >= 0 )
+        return  dir.length();
+    else {
+        return -dir.length();
+    }
+
+    
+
+    
+   // return (p.dot(n)-ray.origin.dot(n))/np;
 }
 
 std::vector<Vector3> BoundingBox::intersect(Ray ray) {
@@ -115,9 +171,15 @@ std::vector<Vector3> BoundingBox::intersect(Ray ray) {
     double t1 = 0;
     std::vector<Vector3> intersections;
 
+    PGA3D min2 = point(min.x, min.y, min.z);
+    PGA3D max2 = point(max.x, max.y, max.z);
+    PGA3D rayl = toLine(ray.origin, ray.origin+ray.direction);
+    
+
     for (int i = 0; i < 3; i++) {
-        double t = intersectPlane(min, Vector3(i == 0, i == 1, i == 2), ray);
-        Vector3 intersection = ray.origin + ray.direction*t;
+        Vector3 intersection;
+        double t = intersectPlaneG((min2 & toPoint(min+Vector3(i == 0, i == 1, i == 2)) | min2), rayl, ray.direction, ray.origin, intersection);
+
         if (t > EPS && contains(intersection)) {
             if (t > t1) {
                 t1 = t;
@@ -128,8 +190,9 @@ std::vector<Vector3> BoundingBox::intersect(Ray ray) {
     }
 
     for (int i = 0; i < 3; i++) {
-        double t = intersectPlane(max, Vector3(-(i == 0), -(i == 1), -(i == 2)), ray);
-        Vector3 intersection = ray.origin + ray.direction*t;
+        Vector3 intersection;
+        double t = intersectPlaneG((max2 & toPoint(max+Vector3(-(i == 0), -(i == 1), -(i == 2))) | max2), rayl, ray.direction, ray.origin, intersection);
+       
         if (t > EPS && contains(intersection)) {
             if (t > t1) {
                 t1 = t;

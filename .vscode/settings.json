@@ -66,7 +66,10 @@
         "functional": "cpp",
         "ios": "cpp",
         "locale": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "memory_resource": "cpp",
+        "map": "cpp",
+        "set": "cpp"
     },
     "C_Cpp.configurationWarnings": "Disabled"
 }

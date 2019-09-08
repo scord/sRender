@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "math/smath2.h"
 #include <algorithm>
 #include <unordered_set>
 

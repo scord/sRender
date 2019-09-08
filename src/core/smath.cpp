@@ -237,7 +237,7 @@ Vector3::Vector3() {
 
 Vector3::Vector3(double x, double y, double z) : x(x), y(y), z(z) {}
 
-double Vector3::dot(const Vector3 &v) {
+double Vector3::dot(const Vector3 &v) const  {
     return x*v.x + y*v.y + z*v.z;
 }
 

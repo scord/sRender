@@ -5,7 +5,7 @@
 const double PI = 3.141592653589793238463;
 const double TAU = 2*PI;
 const double IPI = 1/PI;
-const double EPS = 0.000000001;
+const double EPS = 0.000001;
 
 struct Vector3;
 
@@ -28,7 +28,7 @@ struct Vector3 {
     double x, y, z;
     Vector3();
     Vector3(double x, double y, double z);
-    double dot(const Vector3 &v);
+    double dot(const Vector3 &v) const;
     Vector3 cross(const Vector3 &v);
     Vector3 rotate(Vector3 &v) const; 
     Vector3 operator+(const Vector3 &v) const;

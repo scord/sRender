@@ -27,7 +27,7 @@
 #define PI 3.1415926536
 
 volatile std::atomic<int> progress;
-int tileCount =64;
+int tileCount = 64;
 
 std::vector<std::vector<Vector3>> renderTile(int tileNumber,  std::vector<std::vector<Vector3>> tile, Camera cam, Scene scene, int samplesPerPixel, int maxDepth);
 
@@ -36,7 +36,7 @@ int main() {
 	SceneReader sceneReader("/home/sam/dev/sRender/scenes/box.yaml");
 	//sceneReader.load();
 
-	Camera cam(Vector3(0,0,3), 1280, 1280, PI/6);
+	Camera cam(Vector3(0,0,3), 320, 320, PI/6);
 
 	Scene scene;
 
@@ -122,7 +122,7 @@ int main() {
         }
     }
 
-	int samplesPerPixel = 64;
+	int samplesPerPixel = 16;
 	
 	auto start = std::chrono::high_resolution_clock::now();
 	
