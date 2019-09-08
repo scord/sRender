@@ -78,12 +78,29 @@ Interaction* Scene::intersectVisible(Ray ray) {
                             intersectedGeo->defaultUVMapping()(intersection),
                             intersectedGeo->normal(intersection),
                             intersectedObject->material,
-                            true);
+                            true, minT);
     } else {
         return nullptr;
     }
 }
 
+double Scene::intersectMedium(Sampler& sampler, const Ray& ray, double& pdf) {
+
+    double u = sampler.getRandomDouble();
+    double maxT = 10.0;
+    double sigma = 0.5;
+    double minU = exp(-sigma*maxT);
+    double a = u*(1.0 - minU) + minU;
+
+    double t = -log(a) / sigma;
+    pdf = sigma*a / (1.0 - minU);
+
+    return t;
+
+    
+
+
+}
 
 
 Interaction* Scene::intersect(Ray ray) {
@@ -118,7 +135,7 @@ Interaction* Scene::intersect(Ray ray) {
                             intersectedGeo->defaultUVMapping()(intersection),
                             intersectedGeo->normal(intersection),
                             intersectedObject->material,
-                            true);
+                            true, minT);
     } else {
         return nullptr;
     }

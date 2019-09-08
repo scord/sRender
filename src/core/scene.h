@@ -43,6 +43,7 @@ public:
     Object* sampleLight(Sampler* sampler);
     Interaction* intersect(Ray ray);
     Interaction* intersectVisible(Ray ray);
+    double intersectMedium(Sampler&, const Ray& ray, double& pdf);
     Ray sampleLight();
 };
 

@@ -1,8 +1,8 @@
 #include "interaction.h"
 
 
-Interaction::Interaction(Vector3 direction, Vector3 pos, Vector2 uv, Vector3 n, Material* mat, bool backward) 
-    : position(pos), uv(uv), normal(n), material(mat), backward(backward) {
+Interaction::Interaction(Vector3 direction, Vector3 pos, Vector2 uv, Vector3 n, Material* mat, bool backward, double t) 
+    : position(pos), uv(uv), normal(n), material(mat), backward(backward), t(t) {
     
     odir = direction;
     emission = material->emission.value(uv);
@@ -13,6 +13,13 @@ Interaction::Interaction(Vector3 odir, Vector3 idir, Vector3 pos, Vector2 uv, Ve
     cost = idir.dot(n);
     brdf = getBrdf();
     emission = material->emission.value(uv);
+}
+
+Interaction::Interaction(Vector3 odir, Vector3 idir, Vector3 pos, Vector2 uv, Vector3 n, Material* mat,  bool backward, double pdf, double t)
+    : Interaction(odir, idir, pos, uv, n, mat, backward, pdf) {
+
+    this->t = t;
+
 }
 
 void Interaction::forceSample(Vector3 idir, double pdf) {

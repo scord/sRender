@@ -72,6 +72,7 @@ Vector3 Integrator::getDirectIlluminationMIS(Interaction* interactionP, Interact
     return totalContribution;
 }
 
+
 Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampler) {
 
     Vector3 throughput = Vector3(1,1,1);
@@ -97,6 +98,14 @@ Vector3 Integrator::getRadiance(Ray ray, int depth, Scene* scene, Sampler* sampl
 
     while (i < depth && throughput != Vector3()) {
         interactionP = nextInteractionP;
+
+
+        // sample new position on ray
+        // if new position < interaction
+        // create a medum interaction 
+        double mediumPdf;
+        double mediumT = scene->intersectMedium(*sampler, ray, mediumPdf);
+
 
         // sample brdf at interaction
         interactionP->sample(sampler);
