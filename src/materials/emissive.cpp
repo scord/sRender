@@ -2,25 +2,25 @@
 
 EmissiveMaterial::EmissiveMaterial(){
 }
-EmissiveMaterial::EmissiveMaterial(Vector3 emission) : Material(Vector3(), emission) {
+EmissiveMaterial::EmissiveMaterial(vec3 emission) : Material(vec3(), emission) {
 }
 
-EmissiveMaterial::EmissiveMaterial(Texture texture, Vector3 emission) : Material(Vector3(), emission), texture(texture) {
+EmissiveMaterial::EmissiveMaterial(Texture texture, vec3 emission) : Material(vec3(), emission), texture(texture) {
     this->emission.bindTexture(texture, emission);
 }
 
 
 
-Vector3 EmissiveMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector2 uv) {
-    return Vector3();
+vec3 EmissiveMaterial::getBrdf(vec3 dir, vec3 odir, vec3 n, vec2 uv) {
+    return vec3();
 }
 
 
 
-SampleBSDF EmissiveMaterial::sample(Vector3 odir,  Vector3 n, Sampler* sampler) {
-    return SampleBSDF(Vector3(), Vector3(), 0, 1);
+SampleBSDF EmissiveMaterial::sample(vec3 odir,  vec3 n, Sampler& sampler) {
+    return SampleBSDF(vec3(), vec3(), 0, 1);
 }
 
-double EmissiveMaterial::getPdf(Vector3 dir, Vector3 odir, Vector3 n) {
+double EmissiveMaterial::getPdf(vec3 dir, vec3 odir, vec3 n) {
     return 1;
 }

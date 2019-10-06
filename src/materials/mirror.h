@@ -10,9 +10,9 @@
 class MirrorMaterial : public Material {
 public:
     MirrorMaterial();
-    MirrorMaterial(Vector3 albedo);
-    virtual double getPdf(Vector3 dir, Vector3 odir, Vector3 n);
-    virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector2 uv);
-    virtual SampleBSDF sample(Vector3 dir, Vector3 n, Sampler* sampler);
+    MirrorMaterial(vec3 albedo);
+    virtual double getPdf(vec3 dir, vec3 odir, vec3 n);
+    virtual vec3 getBrdf(vec3 dir, vec3 odir, vec3 n, vec2 uv);
+    virtual SampleBSDF sample(vec3 dir, vec3 n, Sampler& sampler);
 };
 

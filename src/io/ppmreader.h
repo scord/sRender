@@ -26,8 +26,8 @@ public:
         std::istringstream iss2(line);
         int max;
         iss2 >> max;
-        std::vector<std::vector<Vector3>> image;
-        std::vector<Vector3> row;
+        std::vector<std::vector<vec3>> image;
+        std::vector<vec3> row;
 
         while (std::getline(file, line))
         {
@@ -38,7 +38,7 @@ public:
             int b;
 
             while (iss3 >> r >> g >> b) {
-                row.push_back(Vector3(r, g, b)/double(max));
+                row.push_back(vec3(r, g, b)/double(max));
 
                 if (row.size() >= width) {
                     image.push_back(row);

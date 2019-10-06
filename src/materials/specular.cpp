@@ -51,15 +51,15 @@ double SpecularMaterial::fresnel(double cosi, double etai, double etat) {
 
 SpecularMaterial::SpecularMaterial() : Material() {
 }
-SpecularMaterial::SpecularMaterial(Vector3 albedo) : Material(albedo, Vector3()){
+SpecularMaterial::SpecularMaterial(vec3 albedo) : Material(albedo, vec3()){
 }
 
-Vector3 SpecularMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector2 uv) {
+vec3 SpecularMaterial::getBrdf(vec3 dir, vec3 odir, vec3 n, vec2 uv) {
     return albedo.value(uv);
 }
 
-SampleBSDF SpecularMaterial::sample(Vector3 dir, Vector3 n, Sampler* sampler) {
-    dir = Vector3() - dir;
+SampleBSDF SpecularMaterial::sample(vec3 dir, vec3 n, Sampler& sampler) {
+    dir = vec3() - dir;
     double cosi = dir.dot(n);
 
     double etai = 1;
@@ -72,15 +72,15 @@ SampleBSDF SpecularMaterial::sample(Vector3 dir, Vector3 n, Sampler* sampler) {
     if (cosi < 0.0) {
         cosi = -cosi;
     } else {
-        n = Vector3() - n;
+        n = vec3() - n;
         std::swap(etai, etat);
     }
 
     double eta = etai/etat;
     double k = 1 - eta*eta * (1 - cosi*cosi);
    
-    Vector3 newDirection = Vector3();
-    if (sampler->getRandomDouble() <= fr) {
+    vec3 newDirection = vec3();
+    if (sampler.getRandomDouble() <= fr) {
         newDirection = (dir - n*dir.dot(n)*2).norm();
         eta = 1;
     } else {
@@ -90,10 +90,10 @@ SampleBSDF SpecularMaterial::sample(Vector3 dir, Vector3 n, Sampler* sampler) {
         newDirection = dir*eta + n*(eta*cosi - cost);
     }
 
-    return SampleBSDF(newDirection, Vector3(), 1, 1);
+    return SampleBSDF(newDirection, vec3(), 1, 1);
 }
 
-double SpecularMaterial::getPdf(Vector3 dir, Vector3 odir, Vector3 n) {
+double SpecularMaterial::getPdf(vec3 dir, vec3 odir, vec3 n) {
     return 0;
 }
 

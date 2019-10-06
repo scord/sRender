@@ -1,32 +1,43 @@
 #pragma once
 #include "smath.h"
 
-class Sample {
+
+
+template <typename T>
+class Sample{
+public:
+    T value;
+    Sample<T>();
+    Sample<T>(T t, double pdf) : value(t), pdf(pdf) {};
+    double pdf;
 };
 
-class Sample2D : public Sample {
+
+
+
+class Sample2D {
 public:
-    Vector2 value;
+    vec2 value;
     Sample2D();
-    Sample2D(Vector2 v, double pdf);
+    Sample2D(vec2 v, double pdf);
     double pdf;
 };
 
-class Sample3D : public Sample {
+class Sample3D {
 public:
-    Vector3 value;
+    vec3 value;
     Sample3D();
-    Sample3D(Vector3 v, double pdf);
+    Sample3D(vec3 v, double pdf);
     double pdf;
 };
 
-class SampleBSDF : public Sample {
+class SampleBSDF {
 public:
-    Vector3 value;
+    vec3 value;
     SampleBSDF();
-    SampleBSDF(Vector3 v, Vector3 bsdf, double cost, double pdf);
+    SampleBSDF(vec3 v, vec3 bsdf, double cost, double pdf);
     ~SampleBSDF() = default;
     double pdf;
     double cost;
-    Vector3 bsdf;
+    vec3 bsdf;
 };

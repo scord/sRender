@@ -2,16 +2,17 @@
 
 #include <cmath>
 #include "smath.h"
+#include "geometry.h"
 
 class Camera {
     public:
-        Vector3 position;
+        vec3 position;
         int width;
         int height;
         double fovH;
         double fovV;
-        Camera(Vector3 pos, int w, int h, double fov);
-        Vector3 screenToCamera(const Vector2 screenCoord);
-        Ray pixelToRay(const Vector2 screenCoord);
-        Ray pixelToRay(const Vector2 screenCoord, Vector2 centre, double focalLength, double focalDistance);
+        Camera(vec3 pos, int w, int h, double fov);
+        vec3 screenToCamera(const vec2 screenCoord);
+        Ray pixelToRay(const vec2 screenCoord);
+        Ray pixelToRay(const vec2 screenCoord, vec2 centre, double focalLength, double focalDistance);
 };

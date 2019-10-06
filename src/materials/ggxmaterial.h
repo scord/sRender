@@ -10,10 +10,10 @@
 class GGXMaterial : public Material {
 public:
     GGXMaterial();
-    GGXMaterial(Vector3 albedo);
-    GGXMaterial(Vector3 albedo, Vector3 emission);
-    GGXMaterial(Vector3 albedo, double roughness);
-    GGXMaterial(Vector3 albedo, Vector3 specularAlbedo, double roughness);
+    GGXMaterial(vec3 albedo);
+    GGXMaterial(vec3 albedo, vec3 emission);
+    GGXMaterial(vec3 albedo, double roughness);
+    GGXMaterial(vec3 albedo, vec3 specularAlbedo, double roughness);
     double roughness;
     double alpha;
     double alpha2;
@@ -24,10 +24,10 @@ public:
     double g2(double costi, double costr);
     double g2DividedBy2CosiCoso(double costi, double costo);
     double fresnel(double etai, double etat, double cost);
-    Vector3 fresnel(Vector3 r0, double cost);
-    virtual double getPdf(Vector3 dir, Vector3 odir, Vector3 n);
-    virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector2 uv);
-    virtual SampleBSDF sample(Vector3 dir, Vector3 n, Sampler* sampler);
+    vec3 fresnel(vec3 r0, double cost);
+    virtual double getPdf(vec3 dir, vec3 odir, vec3 n);
+    virtual vec3 getBrdf(vec3 dir, vec3 odir, vec3 n, vec2 uv);
+    virtual SampleBSDF sample(vec3 dir, vec3 n, Sampler& sampler);
 
 };
 

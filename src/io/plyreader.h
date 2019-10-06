@@ -32,18 +32,18 @@ public:
         }
         return n;
     }
-    Object* toObject(Vector3 pos, double scale) {
+    Object* toObject(vec3 pos, double scale) {
         return new Object(toTriangles(), pos, scale, new SpecularMaterial());
     }
-     Object* toObject(Vector3 pos, double scale, Material* material) {
+     Object* toObject(vec3 pos, double scale, Material* material) {
         return new Object(toTriangles(), pos, scale, material);
     }
-    KDTreeObject* toKDTreeObject(Vector3 pos, double scale) {
+    KDTreeObject* toKDTreeObject(vec3 pos, double scale) {
         std::vector<Shape*> test = toTriangles();
 
         return new KDTreeObject(test, pos, scale, new SpecularMaterial());
     }
-    KDTreeObject* toKDTreeObject(Vector3 pos, double scale, Material* material) {
+    KDTreeObject* toKDTreeObject(vec3 pos, double scale, Material* material) {
         std::vector<Shape*> test = toTriangles();
 
         return new KDTreeObject(test, pos, scale, material);
@@ -66,7 +66,7 @@ public:
 
         // Elements
 
-        std::vector<Vector3> vertices;
+        std::vector<vec3> vertices;
 
         for (int i = 0; i < vn; i++){
             std::getline(file, line);
@@ -75,7 +75,7 @@ public:
             double x, y, z;
             iss >> x >> y >> z;
 
-            vertices.push_back(Vector3(x,y,z));
+            vertices.push_back(vec3(x,y,z));
         }
 
        

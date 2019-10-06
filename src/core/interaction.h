@@ -3,6 +3,7 @@
 #include <vector>
 #include "geometry.h"
 #include "smath.h"
+#include "medium.h"
 
 
 #include "material.h"
@@ -11,26 +12,29 @@
 class Interaction {
 public:
     Interaction();
-    Interaction(Vector3 direction, Vector3 pos, Vector2 uv, Vector3 n, Material* material, bool backward);
+    Interaction(vec3 direction, vec3 pos);
+    Interaction(vec3 direction, vec3 pos, vec2 uv, vec3 n, Material* material, bool backward);
 
-    Interaction(Vector3 odir, Vector3 idir, Vector3 pos, Vector2 uv, Vector3 n, Material* material, bool backward, double pdf);
+    Interaction(vec3 odir, vec3 idir, vec3 pos, vec2 uv, vec3 n, Material* material, bool backward, double pdf);
 
     Ray getOutgoing();
     Ray getIncoming();
 
-    double cost;
-    void sample(Sampler* sampler);
-    void forceSample(Vector3 idir, double pdf);
-    double getPdf();
-    Vector3 getBrdf();
-    Vector3 emission;
+    bool hit;
 
-    Vector3 position;
-    Vector2 uv;
-    Vector3 normal;
-    Vector3 odir;
-    Vector3 idir;
-    Vector3 brdf;
+    double cost;
+    void sample(Sampler& sampler);
+    void forceSample(vec3 idir, double pdf);
+    double getPdf();
+    vec3 getBrdf();
+    vec3 emission;
+
+    vec3 position;
+    vec2 uv;
+    vec3 normal;
+    vec3 odir;
+    vec3 idir;
+    vec3 brdf;
     double pdf;
 
     Material* material;
@@ -38,4 +42,15 @@ public:
     bool backward;
 
     Sampler sampler;
+};
+
+class MediumInteraction {
+public:
+    MediumInteraction();
+    MediumInteraction(vec3 pos, Medium* medium);
+
+    vec3 position;
+    double pdf;
+    Medium* medium;
+
 };

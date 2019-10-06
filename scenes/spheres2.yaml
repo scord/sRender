@@ -1,0 +1,89 @@
+objects:
+  - type: Quad
+    position: [0, 1, 0]
+    normal: [0, -1, 0]
+    right: [0 , 0, -1]
+    scale: [1.0, 1.0]
+    colour: &grey [0.7, 0.7, 0.7]
+  - type: Quad
+    position: [0, -1, 0]
+    normal: [0, 1, 0]
+    right: [0 , 0, -1]
+    scale: [1.0, 1.0]
+    colour: *grey
+  - type: Quad
+    position: [1, 0, 0]
+    normal: [-1, 0, 0]
+    right: [0 , 0, -1]
+    scale: [1.0, 1.0]
+    colour: *grey
+  - type: Quad
+    position: [-1, 0, 0]
+    normal: [1, 0, 0]
+    right: [0 , 0, -1]
+    scale: [1.0, 1.0]
+    colour: *grey
+  - type: Quad
+    position: [0, 0, -1]
+    normal: [0, 0, 1]
+    right: [1 , 0, 0]
+    scale: [1.0, 1.0]
+    colour: *grey
+  - type: Quad
+    position: [0, 0, 1]
+    normal: [0, 0, -1]
+    right: [0 , 1, 0]
+    scale: [1.0, 1.0]
+    colour: *grey
+  - type: Sphere
+    position: [-0.7, -0.5, 0.6]
+    radius: 0.2
+    material: "/home/sam/dev/sRender/materials/brown.yaml"
+    colour: *grey
+  - type: Sphere
+    position: [0.0, 0.7, 0.1]
+    radius: 0.1
+    material: "/home/sam/dev/sRender/materials/brown.yaml"
+    colour: *grey
+  - type: Sphere
+    position: [-0.5, 0.2, -0.4]
+    radius: 0.05
+    material: "/home/sam/dev/sRender/materials/brown.yaml"
+    colour: *grey
+  - type: Sphere
+    position: [0.7, 0.5, 0.1]
+    radius: 0.25
+    material: "/home/sam/dev/sRender/materials/brown.yaml"
+    colour: *grey
+  - type: Sphere
+    position: [-0.1, -0.1, -0.5]
+    radius: 0.15
+    material: "/home/sam/dev/sRender/materials/brown.yaml"
+    colour: *grey
+  - type: Sphere
+    position: [0.1, -0.2, 0.7]
+    radius: 0.05
+    material: "/home/sam/dev/sRender/materials/brown.yaml"
+    colour: *grey
+lights:
+  - type: Disc
+    position: [-0.5, 0.999, 0.75]
+    radius: 0.2
+    colour: [0.9, 0.1, 0.3]
+    normal: [0, -1, 0]
+    intensity: 100.0
+  - type: Disc
+    position: [0.5, -0.5, -0.999]
+    radius: 0.3
+    colour: [0.1, 0.8, 0.9]
+    normal: [0, 0, 1]
+    intensity: 200.0
+  - type: Disc
+    position: [0.5, 0.999, 0.5]
+    radius: 0.2
+    colour: [0.9, 0.1, 0.9]
+    normal: [0, -1, 0]
+    intensity: 100.0
+
+
+

@@ -10,11 +10,11 @@
 class EmissiveMaterial : public Material {
 public:
     EmissiveMaterial();
-    EmissiveMaterial(Vector3 emission);
-    EmissiveMaterial(Texture texture, Vector3 emission);
-    virtual double getPdf(Vector3 dir, Vector3 odir, Vector3 n);
-    virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector2 uv);
-    virtual SampleBSDF sample(Vector3 dir, Vector3 n, Sampler* sampler);
+    EmissiveMaterial(vec3 emission);
+    EmissiveMaterial(Texture texture, vec3 emission);
+    virtual double getPdf(vec3 dir, vec3 odir, vec3 n);
+    virtual vec3 getBrdf(vec3 dir, vec3 odir, vec3 n, vec2 uv);
+    virtual SampleBSDF sample(vec3 dir, vec3 n, Sampler& sampler);
     Texture texture;
 
 

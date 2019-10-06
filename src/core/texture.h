@@ -10,7 +10,7 @@
 
 class Texture {
 public:
-    Texture(std::vector<std::vector<Vector3>> pixels) : pixels(pixels) {
+    Texture(std::vector<std::vector<vec3>> pixels) : pixels(pixels) {
         width = pixels[0].size();
         height = pixels.size();
     };
@@ -19,7 +19,7 @@ public:
     };
     ~Texture() = default;
 
-    Vector3 sample(Vector2 uv) {
+    vec3 sample(vec2 uv) {
         int x = (int)(uv.x*width);
         if (x == width)
             x = width - 1;
@@ -41,6 +41,6 @@ public:
 
     int width;
     int height;
-    std::vector<std::vector<Vector3>> pixels;
+    std::vector<std::vector<vec3>> pixels;
 
 };

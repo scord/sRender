@@ -24,10 +24,12 @@ public:
             std::vector<double> specular = materialConfig["specular"].as<std::vector<double>>();
             double roughness = materialConfig["roughness"].as<double>();
             material = new FresnelBlend(
-                Vector3(diffuse[0], diffuse[1], diffuse[2]),
-                Vector3(specular[0], specular[1], specular[2]),
+                vec3(diffuse[0], diffuse[1], diffuse[2]),
+                vec3(specular[0], specular[1], specular[2]),
                 roughness
             );
+        } else if (materialConfig["type"].as<std::string>() == "Specular") {
+            material = new SpecularMaterial();
         }
 
         return material;

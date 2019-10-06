@@ -11,16 +11,16 @@
 class OrenNayarMaterial : public Material {
 public:
     OrenNayarMaterial();
-    OrenNayarMaterial(Vector3 albedo);
-    OrenNayarMaterial(Vector3 albedo, Vector3 emission);
-    OrenNayarMaterial(Vector3 albedo, double roughness);
+    OrenNayarMaterial(vec3 albedo);
+    OrenNayarMaterial(vec3 albedo, vec3 emission);
+    OrenNayarMaterial(vec3 albedo, double roughness);
     OrenNayarMaterial(Texture& texture);
 
     Hemisphere hemisphere;
     double roughness;
     Texture texture;
-    virtual double getPdf(Vector3 dir, Vector3 odir, Vector3 n);
-    virtual Vector3 getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector2 uv);
-    virtual SampleBSDF sample(Vector3 dir, Vector3 n, Sampler* sampler);
+    virtual double getPdf(vec3 dir, vec3 odir, vec3 n);
+    virtual vec3 getBrdf(vec3 dir, vec3 odir, vec3 n, vec2 uv);
+    virtual SampleBSDF sample(vec3 dir, vec3 n, Sampler& sampler);
 };
 

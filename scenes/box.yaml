@@ -4,7 +4,7 @@ objects:
     normal: [0, -1, 0]
     right: [0 , 0, -1]
     scale: [1.0, 1.0]
-    colour: &grey [0.4, 0.4, 0.4]
+    colour: &grey [0.7, 0.7, 0.7]
   - type: Quad
     position: [0, -1, 0]
     normal: [0, 1, 0]
@@ -16,17 +16,17 @@ objects:
     normal: [-1, 0, 0]
     right: [0 , 0, -1]
     scale: [1.0, 1.0]
-    colour: [0.1, 0.5, 0.1]
+    colour: *grey
   - type: Quad
     position: [-1, 0, 0]
     normal: [1, 0, 0]
     right: [0 , 0, -1]
     scale: [1.0, 1.0]
-    colour: [0.5, 0.1, 0.1]
+    colour: *grey
   - type: Quad
     position: [0, 0, -1]
     normal: [0, 0, 1]
-    right: [0 , 1, 0]
+    right: [1 , 0, 0]
     scale: [1.0, 1.0]
     colour: *grey
   - type: Quad
@@ -35,26 +35,31 @@ objects:
     right: [0 , 1, 0]
     scale: [1.0, 1.0]
     colour: *grey
-
   - type: File
     position: [0.0, -1.4, 0.0]
-    scale: 7.0
+    scale: 8.0
     colour: [0.5, 1, 1]
     filepath: "/home/sam/dev/sRender/src/dragon.ply"
     material: "/home/sam/dev/sRender/materials/brown.yaml"
 lights:
   - type: Disc
     position: [-0.5, 0.999, -0.5]
-    radius: 0.4
-    colour: [1, 1, 1]
+    radius: 0.2
+    colour: [0.9, 0.1, 0.1]
     normal: [0, -1, 0]
-    intensity: 10.0
-
+    intensity: 100.0
+  - type: Disc
+    position: [0.5, -0.5, -0.999]
+    radius: 0.3
+    colour: [0.1, 0.5, 0.9]
+    normal: [0, 0, 1]
+    intensity: 200.0
   - type: Disc
     position: [0.5, 0.999, 0.5]
-    radius: 0.4
-    colour: [1, 1, 1]
+    radius: 0.2
+    colour: [0.9, 0.1, 0.9]
     normal: [0, -1, 0]
-    intensity: 10.0
+    intensity: 100.0
+
 
 

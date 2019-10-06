@@ -31,7 +31,7 @@ public:
                 Material* material = MaterialReader(material_path).load();
                 
 
-	            KDTreeObject* obj = reader.toKDTreeObject(Vector3(pos[0], pos[1], pos[2]), scale, material);
+	            KDTreeObject* obj = reader.toKDTreeObject(vec3(pos[0], pos[1], pos[2]), scale, material);
 
                 
                 scene.add( obj );
@@ -45,10 +45,10 @@ public:
                 
                 scene.add(new Object(
                     std::vector<Shape*>{new Sphere(
-                        Vector3(pos[0], pos[1], pos[2]),
+                        vec3(pos[0], pos[1], pos[2]),
                         object["radius"].as<double>()
                     )},
-                    Vector3(0,0,0),
+                    vec3(0,0,0),
                     1,
                     material
                 ));
@@ -60,14 +60,14 @@ public:
                 std::vector<double> scale = object["scale"].as<std::vector<double>>();
                 scene.add(new Object(
                     std::vector<Shape*>{new Quad(
-                        Vector3(pos[0], pos[1], pos[2]),
-                        Vector3(norm[0], norm[1], norm[2]),
-                        Vector2(scale[0], scale[1]),
-                        Vector3(right[0], right[1], right[2])
+                        vec3(pos[0], pos[1], pos[2]),
+                        vec3(norm[0], norm[1], norm[2]),
+                        vec2(scale[0], scale[1]),
+                        vec3(right[0], right[1], right[2])
                     )},
-                    Vector3(0,0,0),
+                    vec3(0,0,0),
                     1,
-                    new OrenNayarMaterial(Vector3(col[0],col[1],col[2]),0.95)
+                    new OrenNayarMaterial(vec3(col[0],col[1],col[2]),0.3)
                 ));
             } else if (object["type"].as<std::string>() == "Triangle") {
                 std::vector<double> v0 = object["v0"].as<std::vector<double>>();
@@ -79,11 +79,11 @@ public:
 
                 scene.add(new Object(
                     std::vector<Shape*>{new Triangle(
-                        Vector3(v0[0], v0[1], v0[2]),
-                        Vector3(v1[0], v1[1], v1[2]),
-                        Vector3(v2[0], v2[1], v2[2])
+                        vec3(v0[0], v0[1], v0[2]),
+                        vec3(v1[0], v1[1], v1[2]),
+                        vec3(v2[0], v2[1], v2[2])
                     )},
-                    Vector3(0,0,0),
+                    vec3(0,0,0),
                     1,
                     material
                 ));
@@ -99,13 +99,13 @@ public:
                 double radius = object["radius"].as<double>();
                 scene.addLight(new Object(
                     std::vector<Shape*>{new Disc(
-                        Vector3(pos[0], pos[1], pos[2]),
-                        Vector3(norm[0], norm[1], norm[2]),
-                        Vector2(radius, radius)
+                        vec3(pos[0], pos[1], pos[2]),
+                        vec3(norm[0], norm[1], norm[2]),
+                        vec2(radius, radius)
                     )},
-                    Vector3(0,0,0),
+                    vec3(0,0,0),
                     1,
-                    new EmissiveMaterial(Vector3(col[0],col[1],col[2])*intensity)
+                    new EmissiveMaterial(vec3(col[0],col[1],col[2])*intensity)
                 ));
             }
         }

@@ -1,0 +1,58 @@
+objects:
+  - type: Quad
+    position: [0, 1, 0]
+    normal: [0, -1, 0]
+    right: [0 , 0, -1]
+    scale: [1.0, 1.0]
+    colour: &grey [0.8, 0.8, 0.8]
+  - type: Quad
+    position: [0, -1, 0]
+    normal: [0, 1, 0]
+    right: [0 , 0, -1]
+    scale: [1.0, 1.0]
+    colour: *grey
+  - type: Quad
+    position: [1, 0, 0]
+    normal: [-1, 0, 0]
+    right: [0 , 0, -1]
+    scale: [1.0, 1.0]
+    colour: [0.9, 0.1, 0.1]
+  - type: Quad
+    position: [-1, 0, 0]
+    normal: [1, 0, 0]
+    right: [0 , 0, -1]
+    scale: [1.0, 1.0]
+    colour: [0.1, 0.9, 0.1]
+  - type: Quad
+    position: [0, 0, -1]
+    normal: [0, 0, 1]
+    right: [1 , 0, 0]
+    scale: [1.0, 1.0]
+    colour: *grey
+  - type: Quad
+    position: [0, 0, 1]
+    normal: [0, 0, -1]
+    right: [0 , 1, 0]
+    scale: [1.0, 1.0]
+    colour: *grey
+  - type: Sphere
+    position: [-0.3, -0.6, -0.5]
+    radius: 0.4
+    material: "/home/sam/dev/sRender/materials/shiny.yaml"
+    colour: *grey
+  - type: Sphere
+    position: [0.4, -0.6, 0.5]
+    radius: 0.4
+    material: "/home/sam/dev/sRender/materials/purple.yaml"
+    colour: *grey
+lights:
+  - type: Disc
+    position: [0.0, 0.999, 0.0]
+    radius: 0.5
+    colour: [0.9, 0.9, 0.9]
+    normal: [0, -1, 0]
+    intensity: 1000.0
+
+
+
+

@@ -1,29 +1,29 @@
 #include "orennayar.h"
 
-OrenNayarMaterial::OrenNayarMaterial() : Material(), hemisphere(Vector3(), 1) {
+OrenNayarMaterial::OrenNayarMaterial() : Material(), hemisphere(vec3(), 1) {
     roughness = 0.2;
 }
-OrenNayarMaterial::OrenNayarMaterial(Vector3 albedo) : Material(albedo, Vector3()), hemisphere(Vector3(), 1) {
+OrenNayarMaterial::OrenNayarMaterial(vec3 albedo) : Material(albedo, vec3()), hemisphere(vec3(), 1) {
     roughness = 0.2;
 }
 
-OrenNayarMaterial::OrenNayarMaterial(Texture& texture) : Material(), hemisphere(Vector3(), 1), texture(texture), roughness(0.2) {
+OrenNayarMaterial::OrenNayarMaterial(Texture& texture) : Material(), hemisphere(vec3(), 1), texture(texture), roughness(0.2) {
     albedo.bindTexture(texture);
 }
 
-OrenNayarMaterial::OrenNayarMaterial(Vector3 albedo, Vector3 emission) : Material(albedo, emission), hemisphere(Vector3(), 1) {
+OrenNayarMaterial::OrenNayarMaterial(vec3 albedo, vec3 emission) : Material(albedo, emission), hemisphere(vec3(), 1) {
 }
 
-OrenNayarMaterial::OrenNayarMaterial(Vector3 albedo, double roughness) : Material(albedo, Vector3()), hemisphere(Vector3(), 1), roughness(roughness) {
+OrenNayarMaterial::OrenNayarMaterial(vec3 albedo, double roughness) : Material(albedo, vec3()), hemisphere(vec3(), 1), roughness(roughness) {
 }
 
 
-Vector3 OrenNayarMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector2 uv) {
+vec3 OrenNayarMaterial::getBrdf(vec3 dir, vec3 odir, vec3 n, vec2 uv) {
 
-    Vector3 notParallel(dir.z, dir.y, dir.x);
-    Vector3 perp = (notParallel - n*notParallel.dot(n)).norm();
-    Vector3 dirPerp = (dir - n*dir.dot(n)).norm();
-    Vector3 odirPerp = (odir - n*odir.dot(n)).norm();
+    vec3 up(0, 1, 0);
+    vec3 perp = (up - n*up.dot(n)).norm();
+    vec3 dirPerp = (dir - n*dir.dot(n)).norm();
+    vec3 odirPerp = (odir - n*odir.dot(n)).norm();
     double cospi = std::abs(dirPerp.dot(perp));
     double cospr = std::abs(odirPerp.dot(perp));
     double costi = std::abs(dir.dot(n));
@@ -47,13 +47,13 @@ Vector3 OrenNayarMaterial::getBrdf(Vector3 dir, Vector3 odir, Vector3 n, Vector2
     return albedo.value(uv)*costi*(a+(b*c*sina*tanb))*IPI;
 }
 
-SampleBSDF OrenNayarMaterial::sample(Vector3 odir, Vector3 n, Sampler* sampler) {
-    Sample3D sample = hemisphere.map(sampler->getSample2D());
-    Vector3 idir = sample.value.rotate(n);
-    return SampleBSDF(sample.value.rotate(n), Vector3(), sample.value.z, sample.pdf);
+SampleBSDF OrenNayarMaterial::sample(vec3 odir, vec3 n, Sampler& sampler) {
+    Sample3D sample = hemisphere.map(sampler.getSample2D());
+    vec3 idir = sample.value.rotate(n);
+    return SampleBSDF(sample.value.rotate(n), vec3(), sample.value.z, sample.pdf);
 }
 
-double OrenNayarMaterial::getPdf(Vector3 idir, Vector3 odir, Vector3 n) {
+double OrenNayarMaterial::getPdf(vec3 idir, vec3 odir, vec3 n) {
     return std::abs(idir.dot(n))*IPI;
 }
 

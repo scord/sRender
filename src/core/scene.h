@@ -5,6 +5,7 @@
 #include "kdtree.h"
 #include <memory>
 #include "material.h"
+#include "medium.h"
 #include "interaction.h"
 
 class Object {
@@ -14,19 +15,19 @@ public:
     std::vector<Shape*> geometry;
     Material* material;
     Object() {};
-    Object(std::vector<Shape*> geometry, Vector3 pos, double scale, Material* material);
+    Object(std::vector<Shape*> geometry, vec3 pos, double scale, Material* material);
     bool isVisible;
     BoundingBox aabb;
     BoundingBox calculateBoundingBox();
-    virtual double intersect(Ray ray, Shape* &intersectedGeometry);
+    virtual double intersect(Ray ray, Shape*& intersectedGeometry);
 };
 
 class KDTreeObject : public Object {
 public:
     KDTreeObject() {};
     Material* material;
-    KDTreeObject(std::vector<Shape*> geometry, Vector3 pos, double scale, Material* material);
-    virtual double intersect(Ray ray, Shape* &intersectedGeometry);
+    KDTreeObject(std::vector<Shape*> geometry, vec3 pos, double scale, Material* material);
+    virtual double intersect(Ray ray, Shape*& intersectedGeometry);
     KDTreeNode root;
 };
 
@@ -35,14 +36,17 @@ public:
     std::vector<Object*> objects;
     std::vector<Object*> lights;
     std::vector<Shape*> lightGeometry;
+    Medium* medium;
 
     Scene();
     void add(Object* object);
+    void fill(Medium* medium);
     void addLight(Object* object);
-    Object* getLight(Sampler* sampler);
-    Object* sampleLight(Sampler* sampler);
-    Interaction* intersect(Ray ray);
+    Object* getLight(Sampler& sampler);
+    Object* sampleLight(Sampler& sampler);
+    Interaction intersect(Ray ray) const;
     Interaction* intersectVisible(Ray ray);
     Ray sampleLight();
+    
 };
 

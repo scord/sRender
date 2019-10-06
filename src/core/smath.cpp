@@ -1,12 +1,12 @@
 #include "smath.h"
 
 
-Transform::Transform(Vector3 p, Vector3 s, Vector3 r) {
-    inverse = setMatrix((Vector3()-p)*Vector3(1/s.x, 1/s.y, 1/s.z),Vector3(1/s.x, 1/s.y, 1/s.z),Vector3()-r);
+Transform::Transform(vec3 p, vec3 s, vec3 r) {
+    inverse = setMatrix((vec3()-p)*vec3(1/s.x, 1/s.y, 1/s.z),vec3(1/s.x, 1/s.y, 1/s.z),vec3()-r);
     matrix = setMatrix(p, s, r);
 }
 
-Matrix4 Transform::setMatrix(Vector3 p, Vector3 s, Vector3 r) {
+Matrix4 Transform::setMatrix(vec3 p, vec3 s, vec3 r) {
     Matrix4 matrixTS;
 
     matrixTS.set(0, 0, s.x);
@@ -22,14 +22,14 @@ Matrix4 Transform::setMatrix(Vector3 p, Vector3 s, Vector3 r) {
 
 
 
-Vector3 Transform::apply(Vector3 v) {
+vec3 Transform::apply(vec3 v) {
     Vector4 v4 = matrix*Vector4(v, 1);
-    return Vector3(v4.x, v4.y, v4.z);
+    return vec3(v4.x, v4.y, v4.z);
 }
 
-Vector3 Transform::applyInverse(Vector3 v) {
+vec3 Transform::applyInverse(vec3 v) {
     Vector4 v4 = inverse*Vector4(v, 1);
-    return Vector3(v4.x, v4.y, v4.z);
+    return vec3(v4.x, v4.y, v4.z);
 }
 
 Matrix3::Matrix3() {
@@ -61,8 +61,8 @@ double Matrix3::get(int row, int col) {
 }
 
 
-Vector3 Matrix3::operator*(Vector3 v) const {
-    Vector3 result;
+vec3 Matrix3::operator*(vec3 v) const {
+    vec3 result;
 
     result.x = this->row(0).dot(v);
     result.y = this->row(1).dot(v);
@@ -109,16 +109,16 @@ Matrix3 Matrix3::operator+(Matrix3 m) const {
     return result;
 }
 
-Vector3 Matrix3::column(int i) const {
-    return Vector3(mat[0][i], mat[1][i], mat[2][i]);
+vec3 Matrix3::column(int i) const {
+    return vec3(mat[0][i], mat[1][i], mat[2][i]);
 }
 
-Vector3 Matrix3::row(int i) const {
-    return Vector3(mat[i][0], mat[i][1], mat[i][2]);
+vec3 Matrix3::row(int i) const {
+    return vec3(mat[i][0], mat[i][1], mat[i][2]);
 }
 
-Matrix3 Vector3::rotationMatrix() {
-    Vector3 b(0, 0, 1);
+Matrix3 vec3::rotationMatrix() {
+    vec3 b(0, 0, 1);
 
     Matrix3 v = this->cross(b).norm().skewSymmetric();
 
@@ -133,8 +133,8 @@ Matrix3 Vector3::rotationMatrix() {
 
 }
 
-Vector3 Vector3::rotate(Vector3 &v) const {
-    Vector3 up;
+vec3 vec3::rotate(vec3 &v) const {
+    vec3 up;
     double vx2 = v.x*v.x;
     double vy2 = v.y*v.y;
     double vz2 = v.z*v.z;
@@ -142,30 +142,30 @@ Vector3 Vector3::rotate(Vector3 &v) const {
 
     if (vx2 > vy2) {
 		double invLen = 1.f / std::sqrt(vx2+ vz2);
-		up = Vector3(-v.z * invLen, 0.0f, v.x * invLen);
+		up = vec3(-v.z * invLen, 0.0f, v.x * invLen);
     } else {
 		double invLen = 1.0f / std::sqrt(vy2 + vz2);
-		up = Vector3(0.0f, v.z * invLen, -v.y * invLen);
+		up = vec3(0.0f, v.z * invLen, -v.y * invLen);
     }
-    Vector3 left = v.cross(up);
+    vec3 left = v.cross(up);
 
-    Vector3 rotatedDir;
-	rotatedDir.x = Vector3(up.x, 
+    vec3 rotatedDir;
+	rotatedDir.x = vec3(up.x, 
                            left.x, 
                            v.x).dot(*this);
 
-	rotatedDir.y = Vector3(up.y, 
+	rotatedDir.y = vec3(up.y, 
                            left.y, 
                            v.y).dot(*this);
 
-	rotatedDir.z = Vector3(up.z, 
+	rotatedDir.z = vec3(up.z, 
                            left.z, 
                            v.z).dot(*this);
 	
     return rotatedDir;
 }
 
-Matrix3 Vector3::skewSymmetric() {
+Matrix3 vec3::skewSymmetric() {
     Matrix3 mat(0);
     mat.set(0, 1, -z);
     mat.set(0, 2, y);
@@ -225,42 +225,47 @@ double Vector4::dot(const Vector4 &v) const {
 
 Vector4::Vector4(double x, double y, double z, double w) : x(x), y(y), z(z), w(w) {}
 
-Vector4::Vector4(Vector3 v, double w) : x(v.x), y(v.y), z(v.z), w(w) {}
+Vector4::Vector4(vec3 v, double w) : x(v.x), y(v.y), z(v.z), w(w) {}
 
 Vector4::Vector4() {
     x = y = z = w = 0.f;
 }
 
-Vector3::Vector3() {
+vec3::vec3() {
     x = y = z = 0.f;
 }
 
-Vector3::Vector3(double x, double y, double z) : x(x), y(y), z(z) {}
+double vec3::luminance() const {
+    return 0.299*x + 0.587*y + 0.114*z;
+}
 
-double Vector3::dot(const Vector3 &v) {
+vec3::vec3(double x, double y, double z) : x(x), y(y), z(z) {}
+
+double vec3::dot(const vec3 &v) const {
     return x*v.x + y*v.y + z*v.z;
 }
 
-Vector3 Vector3::cross(const Vector3 &v) {
-    return Vector3(y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x);
+vec3 vec3::cross(const vec3 &v) {
+    return vec3(y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x);
 }
 
-Vector3 Vector3::operator+(const Vector3 &v) const {
-    return Vector3(x + v.x, y + v.y, z + v.z);
+vec3 vec3::operator+(const vec3 &v) const {
+    return vec3(x + v.x, y + v.y, z + v.z);
 }
 
-Vector3 Vector3::operator+=(const Vector3 &v) {
+
+vec3 vec3::operator+=(const vec3 &v) {
     x += v.x;
     y += v.y;
     z += v.z;
     return *this;
 }
 
-Vector3 Vector3::operator-(const Vector3 &v) const {
-    return Vector3(x - v.x, y - v.y, z - v.z);
+vec3 vec3::operator-(const vec3 &v) const {
+    return vec3(x - v.x, y - v.y, z - v.z);
 }
 
-Vector3 Vector3::operator-=(const Vector3 &v){
+vec3 vec3::operator-=(const vec3 &v){
     x -= v.x;
     y -= v.y;
     z -= v.z;
@@ -268,54 +273,54 @@ Vector3 Vector3::operator-=(const Vector3 &v){
 }
 
 
-bool Vector3::operator==(const Vector3 &v) const {
+bool vec3::operator==(const vec3 &v) const {
     return x == v.x && y == v.y && z == v.z;
 }
 
-bool Vector3::operator!=(const Vector3 &v) const {
+bool vec3::operator!=(const vec3 &v) const {
     return x != v.x || y != v.y || z != v.z;
 }
 
-Vector3 Vector3::operator*(double f) const {
-    return Vector3(f*x, f*y, f*z);
+vec3 vec3::operator*(double f) const {
+    return vec3(f*x, f*y, f*z);
 }
 
-Vector3 Vector3::operator*=(double f) {
+vec3 vec3::operator*=(double f) {
     x *= f;
     y *= f;
     z *= f;
     return *this;
 }
 
-Vector3 Vector3::operator*(Vector3 v) const {
-    return Vector3(x*v.x, y*v.y, z*v.z);
+vec3 vec3::operator*(vec3 v) const {
+    return vec3(x*v.x, y*v.y, z*v.z);
 }
 
-Vector3 Vector3::operator/(double f) const {
-    return Vector3(x/f, y/f, z/f);
+vec3 vec3::operator/(double f) const {
+    return vec3(x/f, y/f, z/f);
 }
 
-Vector3 Vector3::operator/=(double f) {
+vec3 vec3::operator/=(double f) {
     x /= f;
     y /= f;
     z /= f;
     return *this;
 }
 
-double Vector3::length() const { 
+double vec3::length() const { 
     return std::sqrt(x * x + y * y + z * z);
 }  
 
-Vector3 Vector3::norm() {
+vec3 vec3::norm() {
     double len = length();
     if (len == 0 ) {
-        return Vector3();
+        return vec3();
     } else {
-        return Vector3(x/len, y/len, z/len);
+        return vec3(x/len, y/len, z/len);
     }
 }
 
-Vector3 Vector3::clamp() {
+vec3 vec3::clamp() {
     double a,b,c;
     if (x > 1.0) {
         a = 1.0;
@@ -332,93 +337,63 @@ Vector3 Vector3::clamp() {
     } else {
         c = z;
     }
-    return Vector3(a, b, c);
+    return vec3(a, b, c);
 }
 
-Vector2::Vector2() {
+vec2::vec2() {
         x = y = 0.f;
     }
 
-Vector2::Vector2(double x, double y): x(x), y(y) {}
+vec2::vec2(double x, double y): x(x), y(y) {}
 
-Vector2 Vector2::operator+(const Vector2 &v) const {
-    return Vector2(x + v.x, y + v.y);
+vec2 vec2::operator+(const vec2 &v) const {
+    return vec2(x + v.x, y + v.y);
 }
 
-Vector2 Vector2::operator+=(const Vector2 &v) {
+vec2 vec2::operator+=(const vec2 &v) {
     x += v.x;
     y += v.y;
     return *this;
 }
 
-Vector2 Vector2::operator-(const Vector2 &v) const {
-    return Vector2(x - v.x, y - v.y);
+vec2 vec2::operator-(const vec2 &v) const {
+    return vec2(x - v.x, y - v.y);
 }
 
-Vector2 Vector2::operator-=(const Vector2 &v){
+vec2 vec2::operator-=(const vec2 &v){
     x -= v.x;
     y -= v.y;
     return *this;
 }
 
-bool Vector2::operator==(const Vector2 &v) const {
+bool vec2::operator==(const vec2 &v) const {
     return x == v.x && y == v.y;
 }
 
-bool Vector2::operator!=(const Vector2 &v) const {
+bool vec2::operator!=(const vec2 &v) const {
     return x != v.x || y != v.y;
 }
 
-Vector2 Vector2::operator*(double f) const {
-    return Vector2(f*x, f*y);
+vec2 vec2::operator*(double f) const {
+    return vec2(f*x, f*y);
 }
 
-Vector2 Vector2::operator*=(double f) {
+vec2 vec2::operator*=(double f) {
     x *= f;
     y *= f;
     return *this;
 }
 
-Vector2 Vector2::operator/(double f) const {
-    return Vector2(x/f, y/f);
+vec2 vec2::operator/(double f) const {
+    return vec2(x/f, y/f);
 }
 
-Vector2 Vector2::operator/=(double f) {
+vec2 vec2::operator/=(double f) {
     x /= f;
     y /= f;
     return *this;
 }
 
-double Vector2::length() const { 
+double vec2::length() const { 
     return std::sqrt(x * x + y * y);
-}
-
-Ray::Ray(Vector3 origin, Vector3 direction):origin(origin), direction(direction) {}
-//0,0,-1
-
-void Ray::rotateToVector(Vector3 v) {
-    Vector3 up;
-    if (std::abs(v.x) > std::abs(v.y)) {
-		double invLen = 1.f / sqrt(v.x * v.x + v.z * v.z);
-		up = Vector3(-v.z * invLen, 0.0f, v.x * invLen);
-    } else {
-		double invLen = 1.0f / sqrt(v.y * v.y + v.z * v.z);
-		up = Vector3(0.0f, v.z * invLen, -v.y * invLen);
-    }
-    Vector3 left = v.cross(up);
-
-    Vector3 rotatedDir;
-	rotatedDir.x = Vector3(up.x, 
-                           left.x, 
-                           v.x).dot(direction);
-
-	rotatedDir.y = Vector3(up.y, 
-                           left.y, 
-                           v.y).dot(direction);
-
-	rotatedDir.z = Vector3(up.z, 
-                           left.z, 
-                           v.z).dot(direction);
-	
-    direction = rotatedDir;
 }

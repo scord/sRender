@@ -1,8 +1,11 @@
 #include "scene.h"
+#include "medium.h"
 #include <algorithm>
 #include <unordered_set>
 
-Scene::Scene() {}
+Scene::Scene() {
+    fill(new Medium());
+}
 
 void Scene::add(Object* object) {
     object->isVisible = true;
@@ -15,14 +18,18 @@ void Scene::add(Object* object) {
     }
 }
 
+void Scene::fill(Medium* medium) {
+    this->medium = medium;
+}
+
 void Scene::addLight(Object* object) {
     object->isVisible = false;
     objects.push_back(object);
     lights.push_back(object);
 }
 
-Object* Scene::getLight(Sampler* sampler) {
-    double r = sampler->getRandomDouble();
+Object* Scene::getLight(Sampler& sampler) {
+    double r = sampler.getRandomDouble();
     if (r < 0.5)
         return lights[0];
     else
@@ -30,11 +37,11 @@ Object* Scene::getLight(Sampler* sampler) {
 }
 
 
-Object* Scene::sampleLight(Sampler* sampler) {
+Object* Scene::sampleLight(Sampler& sampler) {
     double totalArea = 0;
     double n_lights = lights.size();
     if (n_lights > 0) {
-        int r = int(n_lights*sampler->getRandomDouble());
+        int r = int(n_lights*sampler.getRandomDouble());
         return lights[r];
     } else {
         return nullptr;
@@ -70,9 +77,9 @@ Interaction* Scene::intersectVisible(Ray ray) {
     }
 
     if (intersectionFound) {
-        Vector3 intersection = ray.origin+ray.direction*minT;
+        vec3 intersection = ray.origin+ray.direction*minT;
 
-        return new Interaction(Vector3()-ray.direction,
+        return new Interaction(vec3()-ray.direction,
                             intersection,
                             intersectedGeo->defaultUVMapping()(intersection),
                             intersectedGeo->normal(intersection),
@@ -85,7 +92,7 @@ Interaction* Scene::intersectVisible(Ray ray) {
 
 
 
-Interaction* Scene::intersect(Ray ray) {
+Interaction Scene::intersect(Ray ray) const {
 
     double minT = 99999;
     bool intersectionFound = false;
@@ -110,42 +117,42 @@ Interaction* Scene::intersect(Ray ray) {
     }
 
     if (intersectionFound) {
-        Vector3 intersection = ray.origin+ray.direction*minT;
+        vec3 intersection = ray.origin+ray.direction*minT;
 
-        return new Interaction(Vector3()-ray.direction,
+        return Interaction(vec3()-ray.direction,
                             intersection,
                             intersectedGeo->defaultUVMapping()(intersection),
                             intersectedGeo->normal(intersection),
                             intersectedObject->material,
                             true);
     } else {
-        return nullptr;
+        return Interaction(vec3()-ray.direction, ray.origin+ray.direction*1000000.0);
     }
 }
 
-Object::Object(std::vector<Shape*> geometry, Vector3 pos, double scale, Material* material) : geometry(geometry), transform(Transform(pos, Vector3(scale, scale, scale), Vector3())), aabb(calculateBoundingBox()), material(material) {
+Object::Object(std::vector<Shape*> geometry, vec3 pos, double scale, Material* material) : geometry(geometry), transform(Transform(pos, vec3(scale, scale, scale), vec3())), aabb(calculateBoundingBox()), material(material) {
     for (int i = 0; i < geometry.size(); i++) {
-        geometry[i]->transform(pos, Vector3(scale, scale, scale));
+        geometry[i]->transform(pos, vec3(scale, scale, scale));
     }    
 }
 
-KDTreeObject::KDTreeObject(std::vector<Shape*> geometry, Vector3 pos, double scale, Material* material) : 
+KDTreeObject::KDTreeObject(std::vector<Shape*> geometry, vec3 pos, double scale, Material* material) : 
     Object(geometry, pos, scale, material) { 
     root = KDTreeNode(calculateBoundingBox(), this->geometry, 0);
 }
 
 Ray Object::objectSpaceRay(Ray ray) {
-    Vector3 p0 = ray.origin;
-    Vector3 p1 = ray.origin+ray.direction;
+    vec3 p0 = ray.origin;
+    vec3 p1 = ray.origin+ray.direction;
 
-    Vector3 tp0 = transform.applyInverse(p0);
+    vec3 tp0 = transform.applyInverse(p0);
     return Ray(tp0, (transform.applyInverse(p1) - tp0).norm());
 
 }
 
 BoundingBox Object::calculateBoundingBox() {
-    Vector3 min(0,0,0);
-    Vector3 max(0,0,0);
+    vec3 min(0,0,0);
+    vec3 max(0,0,0);
     
     for (auto shape : geometry) {
         if (shape->aabb.min.x < min.x) {
@@ -171,7 +178,7 @@ BoundingBox Object::calculateBoundingBox() {
 
     return BoundingBox(min,max);
 }
-double Object::intersect(Ray ray, Shape* &intersectedGeometry) {
+double Object::intersect(Ray ray, Shape*& intersectedGeometry) {
     
 
 
@@ -191,7 +198,7 @@ double Object::intersect(Ray ray, Shape* &intersectedGeometry) {
    
 }
 
-double KDTreeObject::intersect(Ray ray, Shape* &intersectedGeometry) {
+double KDTreeObject::intersect(Ray ray, Shape*& intersectedGeometry) {
 
 
     double t = root.intersect(ray, intersectedGeometry);

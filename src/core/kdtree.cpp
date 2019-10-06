@@ -22,23 +22,23 @@ KDTreeNode::KDTreeNode(BoundingBox box, std::vector<Shape*> geometry, int depth)
     std::vector<Shape*> rightGeometry;
 
     splitPoint = 0;
-    Vector3 leftMax;
-    Vector3 rightMin;
+    vec3 leftMax;
+    vec3 rightMin;
 
     splitAxis = depth % 3;
 
     if (splitAxis == 0) {
         splitPoint = (box.min.x + box.max.x)/2.0;
-        leftMax = Vector3(splitPoint,box.max.y,box.max.z);
-        rightMin = Vector3(splitPoint,box.min.y, box.min.z);
+        leftMax = vec3(splitPoint,box.max.y,box.max.z);
+        rightMin = vec3(splitPoint,box.min.y, box.min.z);
     } else if (splitAxis == 1) {
         splitPoint = (box.min.y + box.max.y)/2.0;
-        leftMax = Vector3(box.max.x,splitPoint,box.max.z);
-        rightMin = Vector3(box.min.x,splitPoint, box.min.z);
+        leftMax = vec3(box.max.x,splitPoint,box.max.z);
+        rightMin = vec3(box.min.x,splitPoint, box.min.z);
     } else if (splitAxis == 2) {
         splitPoint = (box.min.z + box.max.z)/2.0;
-        leftMax = Vector3(box.max.x, box.max.y, splitPoint);
-        rightMin = Vector3(box.min.x, box.min.y, splitPoint);
+        leftMax = vec3(box.max.x, box.max.y, splitPoint);
+        rightMin = vec3(box.min.x, box.min.y, splitPoint);
     }
 
     BoundingBox leftBox(box.min, leftMax);
@@ -56,7 +56,7 @@ KDTreeNode::KDTreeNode(BoundingBox box, std::vector<Shape*> geometry, int depth)
 
 }
 
-double KDTreeNode::intersect(Ray ray, Vector3& near, Vector3& far, Shape* & intersectedGeometry) {
+double KDTreeNode::intersect(Ray ray, vec3& near, vec3& far, Shape* & intersectedGeometry) {
 
     if (isLeaf) {
  
@@ -95,7 +95,7 @@ double KDTreeNode::intersect(Ray ray, Vector3& near, Vector3& far, Shape* & inte
         if (n <= splitPoint) {
             // left
             if (f > splitPoint) {
-                Vector3 newFar = near + (far - near) * ((splitPoint - n) / (f - n));
+                vec3 newFar = near + (far - near) * ((splitPoint - n) / (f - n));
                 t = left->intersect(ray, near, newFar, intersectedGeometry);
                 Shape* intersectedGeometry2;
                 double t2 = right->intersect(ray, newFar, far, intersectedGeometry2);
@@ -109,7 +109,7 @@ double KDTreeNode::intersect(Ray ray, Vector3& near, Vector3& far, Shape* & inte
         } else {
             // right
             if (f <= splitPoint) {
-                Vector3 newFar = near + (far - near) * ((splitPoint - n) / (f - n));
+                vec3 newFar = near + (far - near) * ((splitPoint - n) / (f - n));
                 t = right->intersect(ray, near, newFar, intersectedGeometry);
             
                 Shape* intersectedGeometry2;
@@ -130,15 +130,15 @@ double KDTreeNode::intersect(Ray ray, Vector3& near, Vector3& far, Shape* & inte
 }
 
 double KDTreeNode::intersect(Ray ray, Shape* & intersectedGeometry) {
-    std::vector<Vector3> intersections = aabb.intersect(ray);
+    std::vector<vec3> intersections = aabb.intersect(ray);
 
     if (intersections.size() <= 1) {
         return -1;
     }
   //  std::cout << intersections.size() << "\n";
    // assert(intersections.size() == 2);
-    Vector3 near = intersections[0];
-    Vector3 far = intersections[1];
+    vec3 near = intersections[0];
+    vec3 far = intersections[1];
 
     return intersect(ray, near, far, intersectedGeometry);
 }
@@ -149,14 +149,14 @@ std::vector<Shape*> KDTreeNode::findGeometry(Ray ray) {
     
 
     if (isLeaf) {
-        std::vector<Vector3> intersections = aabb.intersect(ray);
+        std::vector<vec3> intersections = aabb.intersect(ray);
 
         if (intersections.size() == 0)
             return std::vector<Shape*>();
         else
             return geometry;
     } else {
-        std::vector<Vector3> intersections = aabb.intersect(ray);
+        std::vector<vec3> intersections = aabb.intersect(ray);
 
         if (intersections.size() == 0)
             return std::vector<Shape*>();
